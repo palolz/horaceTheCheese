@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-label="horace the rover — a red WAVE ROVER with binocular camera eyes and a blue LiDAR on a yellow mast">
+  <!-- ground shadow -->
+  <ellipse cx="320" cy="436" rx="250" ry="20" fill="#211D15" opacity="0.10"/>
+
+  <!-- wheels: black with cream hubs, like the real WAVE ROVER -->
+  <circle cx="186" cy="362" r="74" fill="#211D15"/>
+  <circle cx="186" cy="362" r="28" fill="#F6EFE2" stroke="#211D15" stroke-width="7"/>
+  <circle cx="186" cy="362" r="6" fill="#211D15"/>
+  <circle cx="454" cy="362" r="74" fill="#211D15"/>
+  <circle cx="454" cy="362" r="28" fill="#F6EFE2" stroke="#211D15" stroke-width="7"/>
+  <circle cx="454" cy="362" r="6" fill="#211D15"/>
+
+  <!-- chassis bar -->
+  <rect x="186" y="330" width="268" height="34" fill="#211D15"/>
+
+  <!-- body -->
+  <rect x="108" y="176" width="424" height="152" rx="52" fill="#E4402A" stroke="#211D15" stroke-width="10"/>
+
+  <!-- cheese brand mark -->
+  <polygon points="150,302 222,302 222,238" fill="#F2B417" stroke="#211D15" stroke-width="7" stroke-linejoin="round"/>
+  <circle cx="204" cy="284" r="8" fill="#F6EFE2" stroke="#211D15" stroke-width="5"/>
+
+  <!-- binocular eyes (stereo camera) -->
+  <circle cx="392" cy="252" r="36" fill="#F6EFE2" stroke="#211D15" stroke-width="8"/>
+  <circle cx="392" cy="252" r="14" fill="#2B5FAB" stroke="#211D15" stroke-width="6"/>
+  <circle cx="480" cy="252" r="36" fill="#F6EFE2" stroke="#211D15" stroke-width="8"/>
+  <circle cx="480" cy="252" r="14" fill="#2B5FAB" stroke="#211D15" stroke-width="6"/>
+
+  <!-- mast + LiDAR puck -->
+  <rect x="224" y="86" width="28" height="96" rx="10" fill="#F2B417" stroke="#211D15" stroke-width="8"/>
+  <rect x="198" y="44" width="80" height="46" rx="16" fill="#2B5FAB" stroke="#211D15" stroke-width="8"/>
+</svg>

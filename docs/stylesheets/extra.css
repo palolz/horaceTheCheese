@@ -1,0 +1,374 @@
+/* horaceTheCheese — "late seventies toy" theme
+   cream paper, soft-black ink, primary red/blue/yellow,
+   chunky rounded corners, thick borders, hard offset shadows. */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --htc-cream: #F6EFE2;
+  --htc-ink: #211D15;
+  --htc-red: #E4402A;
+  --htc-blue: #2B5FAB;
+  --htc-yellow: #F2B417;
+
+  --md-primary-fg-color: var(--htc-cream);
+  --md-primary-fg-color--light: var(--htc-cream);
+  --md-primary-fg-color--dark: var(--htc-cream);
+  --md-accent-fg-color: var(--htc-red);
+  --md-default-bg-color: var(--htc-cream);
+  --md-default-fg-color: var(--htc-ink);
+  --md-default-fg-color--light: var(--htc-ink);
+  --md-default-fg-color--lighter: rgba(33, 29, 21, 0.55);
+  --md-typeset-color: var(--htc-ink);
+  --md-typeset-a-color: var(--htc-blue);
+  --md-code-bg-color: #EFE5D2;
+  --md-code-fg-color: var(--htc-ink);
+  --md-footer-bg-color: var(--htc-ink);
+  --md-footer-bg-color--dark: var(--htc-ink);
+  --md-footer-fg-color: var(--htc-cream);
+  --md-footer-fg-color--light: var(--htc-cream);
+  --md-footer-fg-color--lighter: rgba(246, 239, 226, 0.6);
+
+  --htc-border: 3px solid var(--htc-ink);
+  --htc-shadow: 6px 6px 0 var(--htc-ink);
+  --htc-shadow-sm: 4px 4px 0 var(--htc-ink);
+}
+
+/* Headings: Fredoka — bold, rounded, toy-like */
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4,
+.md-header__topic,
+.md-tabs__link,
+.md-nav__title,
+.md-footer__title {
+  font-family: 'Fredoka', 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.md-typeset h1 {
+  font-weight: 700;
+}
+
+/* Header & tabs: ink bar with cream type */
+.md-header {
+  background-color: var(--htc-ink);
+  color: var(--htc-cream);
+}
+
+.md-header__title,
+.md-header__button,
+.md-header__topic {
+  color: var(--htc-cream);
+}
+
+.md-tabs {
+  background-color: var(--htc-ink);
+  color: var(--htc-cream);
+  border-bottom: 3px solid var(--htc-ink);
+}
+
+.md-tabs__link {
+  color: var(--htc-cream);
+  opacity: 0.75;
+}
+
+.md-tabs__link--active,
+.md-tabs__link:hover {
+  color: var(--htc-yellow);
+  opacity: 1;
+}
+
+.md-tabs__item {
+  border-bottom: none;
+}
+
+/* Sidebar nav: toy-label feel */
+.md-nav__link {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.md-nav__link--active,
+.md-nav__link:hover {
+  color: var(--htc-red);
+}
+
+.md-nav--secondary .md-nav__link {
+  text-transform: none;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: 0;
+}
+
+/* Links */
+.md-typeset a {
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.md-typeset a:hover {
+  color: var(--htc-red);
+}
+
+/* ---- Hero (home page) ---- */
+.htc-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2rem;
+  padding: 2.2rem;
+  margin: 1.5rem 0 2.5rem;
+  background: var(--htc-cream);
+  border: var(--htc-border);
+  border-radius: 28px;
+  box-shadow: var(--htc-shadow);
+}
+
+.htc-hero__text {
+  flex: 1 1 320px;
+  min-width: 280px;
+}
+
+.htc-hero__art {
+  flex: 0 1 300px;
+  min-width: 220px;
+}
+
+.htc-hero__art img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.htc-kicker {
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--htc-cream);
+  background: var(--htc-red);
+  border: var(--htc-border);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  box-shadow: var(--htc-shadow-sm);
+  margin-bottom: 1rem;
+}
+
+.htc-hero h1 {
+  margin: 0 0 0.8rem;
+  font-size: 2.4rem;
+  line-height: 1.1;
+}
+
+.htc-hero p {
+  font-size: 1rem;
+  margin: 0 0 1.4rem;
+}
+
+/* Toy buttons */
+.htc-btn {
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--htc-cream) !important;
+  background: var(--htc-blue);
+  border: var(--htc-border);
+  border-radius: 16px;
+  padding: 0.6rem 1.2rem;
+  box-shadow: var(--htc-shadow-sm);
+  margin: 0 0.7rem 0.7rem 0;
+  text-decoration: none !important;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.htc-btn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--htc-ink);
+}
+
+.htc-btn--red {
+  background: var(--htc-red);
+}
+
+.htc-btn--yellow {
+  background: var(--htc-yellow);
+  color: var(--htc-ink) !important;
+}
+
+/* ---- Stage / card grid ---- */
+.htc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.4rem;
+  margin: 1.5rem 0;
+}
+
+.htc-card {
+  display: block;
+  background: var(--htc-cream);
+  border: var(--htc-border);
+  border-radius: 20px;
+  box-shadow: var(--htc-shadow);
+  padding: 1.2rem 1.3rem 1.4rem;
+  color: var(--htc-ink) !important;
+  text-decoration: none !important;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.htc-card:hover {
+  transform: translate(3px, 3px);
+  box-shadow: 3px 3px 0 var(--htc-ink);
+}
+
+.htc-card__num {
+  display: inline-block;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--htc-cream);
+  background: var(--htc-ink);
+  border-radius: 12px;
+  padding: 0.35rem 0.6rem;
+  margin-bottom: 0.7rem;
+}
+
+.htc-card h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.15rem;
+}
+
+.htc-card p {
+  margin: 0 0 0.9rem;
+  font-size: 0.82rem;
+  opacity: 0.85;
+}
+
+/* ---- Status badges: pill, bordered, color-coded ---- */
+.htc-badge {
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  border: 3px solid var(--htc-ink);
+  border-radius: 999px;
+  padding: 0.2rem 0.75rem;
+  color: var(--htc-ink);
+  vertical-align: middle;
+}
+
+.htc-badge--progress {
+  background: var(--htc-yellow);
+}
+
+.htc-badge--planned {
+  background: var(--htc-cream);
+}
+
+.htc-badge--done {
+  background: var(--htc-blue);
+  color: var(--htc-cream);
+}
+
+/* ---- Admonitions, code, tables get toy borders ---- */
+.md-typeset .admonition,
+.md-typeset details {
+  border: var(--htc-border);
+  border-radius: 16px;
+  box-shadow: var(--htc-shadow-sm);
+  overflow: hidden;
+}
+
+.md-typeset .admonition-title,
+.md-typeset summary {
+  background: var(--htc-yellow);
+  color: var(--htc-ink);
+  font-family: 'Fredoka', sans-serif;
+  border-bottom: var(--htc-border);
+}
+
+.md-typeset .admonition-title::before,
+.md-typeset summary::before {
+  background-color: var(--htc-ink);
+}
+
+.md-typeset .note > .admonition-title,
+.md-typeset details.note > summary {
+  background: var(--htc-blue);
+  color: var(--htc-cream);
+}
+
+.md-typeset .note > .admonition-title::before,
+.md-typeset details.note > summary::before {
+  background-color: var(--htc-cream);
+}
+
+.md-typeset .warning > .admonition-title,
+.md-typeset details.warning > summary {
+  background: var(--htc-red);
+  color: var(--htc-cream);
+}
+
+.md-typeset .warning > .admonition-title::before,
+.md-typeset details.warning > summary::before {
+  background-color: var(--htc-cream);
+}
+
+.md-typeset pre:not(.mermaid) {
+  border: var(--htc-border);
+  border-radius: 16px;
+  box-shadow: var(--htc-shadow-sm);
+}
+
+.md-typeset table:not([class]) {
+  border: var(--htc-border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--htc-shadow-sm);
+}
+
+.md-typeset table:not([class]) th {
+  background: var(--htc-ink);
+  color: var(--htc-cream);
+  font-family: 'Space Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.66rem;
+}
+
+/* Mermaid diagrams: toy frame */
+.md-typeset .mermaid {
+  background: var(--htc-cream);
+  border: var(--htc-border);
+  border-radius: 20px;
+  box-shadow: var(--htc-shadow);
+  padding: 1.2rem;
+  text-align: center;
+}
+
+/* Big page titles */
+.md-typeset h1:first-of-type {
+  display: inline-block;
+  background: var(--htc-yellow);
+  border: var(--htc-border);
+  border-radius: 20px;
+  box-shadow: var(--htc-shadow-sm);
+  padding: 0.3rem 1.1rem;
+}
+
+/* Footer stays ink */
+.md-footer-meta,
+.md-footer-copyright {
+  color: var(--htc-cream);
+}
