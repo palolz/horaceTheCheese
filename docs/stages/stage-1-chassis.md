@@ -8,8 +8,8 @@ Get the WAVE ROVER driving under ROS 2 Jazzy. The onboard ESP32 keeps its stock 
     <figcaption>Horace on the cutting mat with the metal expansion deck plate and the LDROBOT D500 LiDAR Kit box waiting for Stage 2.</figcaption>
   </figure>
   <figure class="htc-photo">
-    <img src="../../assets/hardware/oled-ap-ugv.jpg" alt="Close-up of the WAVE ROVER OLED screen showing AP:UGV, ST: OFF, MAC:24:DC:C3:C6:27:F4, V:12.39">
-    <figcaption>First boot OLED readout: <code>AP:UGV</code>, <code>ST: OFF</code>, <code>MAC:24:DC:C3:C6:27:F4</code>, battery at a healthy <code>V:12.39</code>.</figcaption>
+    <img src="../../assets/hardware/oled-ap-ugv.jpg" alt="Close-up of the WAVE ROVER OLED screen showing AP:UGV, ST: OFF, MAC:XX:XX:XX:XX:XX:XX, V:12.39">
+    <figcaption>First boot OLED readout: <code>AP:UGV</code>, <code>ST: OFF</code>, <code>MAC:XX:XX:XX:XX:XX:XX</code>, battery at a healthy <code>V:12.39</code>.</figcaption>
   </figure>
 </div>
 
@@ -56,7 +56,7 @@ Older Waveshare documentation lists the default hotspot SSID as `WAVE_ROVER`, bu
 | **AP SSID** | `UGV` |
 | **AP Password** | `12345678` |
 | **Rover IP (AP mode)** | `192.168.4.1` |
-| **MAC Address** | `24:DC:C3:C6:27:F4` |
+| **MAC Address** | `XX:XX:XX:XX:XX:XX` |
 | **Battery (3S 18650)** | `12.39 V` (full charge) |
 
 !!! warning "Why `T:404` home Wi-Fi (STA mode) fails on UniFi Wi-Fi 7"

@@ -14,7 +14,7 @@ Horace is officially alive, talking to ROS 2 Jazzy, and spinning all four wheels
     <figcaption>Horace on the bench with its metal mounting deck and the LDROBOT D500 LiDAR Kit box ready in the background.</figcaption>
   </figure>
   <figure class="htc-photo">
-    <img src="../assets/hardware/oled-ap-ugv.jpg" alt="OLED screen showing AP:UGV, ST: OFF, MAC:24:DC:C3:C6:27:F4, V:12.39">
+    <img src="../assets/hardware/oled-ap-ugv.jpg" alt="OLED screen showing AP:UGV, ST: OFF, MAC:XX:XX:XX:XX:XX:XX, V:12.39">
     <figcaption>Mystery solved: newer Waveshare firmware boots SSID <code>UGV</code> (not <code>WAVE_ROVER</code>), showing <code>V:12.39</code> on the 3S pack.</figcaption>
   </figure>
 </div>
@@ -22,7 +22,7 @@ Horace is officially alive, talking to ROS 2 Jazzy, and spinning all four wheels
 **What happened:**
 
 - **ROS 2 Jazzy on Apple Silicon:** Installed Miniforge + RoboStack (`robostack-jazzy`) natively on `osx-arm64` (`ros-jazzy-ros-base`, `ros-jazzy-teleop-twist-keyboard`, `colcon-common-extensions`).
-- **Cracked the Wi-Fi SSID Plot Twist:** Scanning for `WAVE_ROVER` came up empty because newer General Driver for Robots firmware broadcasts **`AP:UGV`** (`192.168.4.1`, MAC `24:DC:C3:C6:27:F4`, battery `12.39 V`), which was right there on the OLED the whole time.
+- **Cracked the Wi-Fi SSID Plot Twist:** Scanning for `WAVE_ROVER` came up empty because newer General Driver for Robots firmware broadcasts **`AP:UGV`** (`192.168.4.1`, MAC `XX:XX:XX:XX:XX:XX`, battery `12.39 V`), which was right there on the OLED the whole time.
 - **Verified HTTP JSON Control & First Motion:**
     - Sent `GET http://192.168.4.1/js?json={"T":3,"lineNum":0,"Text":"HORACE LIVES"}` → `HTTP/1.1 200 OK` and printed `HORACE LIVES` across line 0 of the OLED.
     - Sent `{"T":1,"L":0.25,"R":0.25}` → spun both left and right wheel pairs forward smoothly, followed by `{"T":1,"L":0,"R":0}` to stop and `{"T":-3}` to restore the status OLED.

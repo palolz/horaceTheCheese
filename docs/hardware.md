@@ -4,7 +4,7 @@ Everything the rover is (or will be) made of, photographed on the workbench as p
 
 | Part | Role | Source / model | Status |
 | --- | --- | --- | --- |
-| WAVE ROVER 4WD chassis | 4× N20 gearmotors, General Driver for Robots (ESP32), 9-axis IMU, OLED, 3S 18650 pack (`12.39 V`) | [Waveshare WAVE ROVER](https://www.waveshare.com/wiki/WAVE_ROVER) (`MAC: 24:DC:C3:C6:27:F4`) | <span class="htc-badge htc-badge--done">Done · Rolling</span> |
+| WAVE ROVER 4WD chassis | 4× N20 gearmotors, General Driver for Robots (ESP32), 9-axis IMU, OLED, 3S 18650 pack (`12.39 V`) | [Waveshare WAVE ROVER](https://www.waveshare.com/wiki/WAVE_ROVER) (`MAC: XX:XX:XX:XX:XX:XX`) | <span class="htc-badge htc-badge--done">Done · Rolling</span> |
 | Metal top expansion plate | Slotted anodized mounting deck + standoffs for LiDAR & compute | Bundled with WAVE ROVER | <span class="htc-badge htc-badge--done">On hand</span> |
 | 2D LiDAR kit | 360° laser scans for Stage 2 SLAM | **LDROBOT D500 LiDAR Kit** (LD19 / DTOFLiDAR) | <span class="htc-badge htc-badge--done">On hand</span> |
 | Companion SBC (bench candidate) | Compact Linux board spotted on the cutting mat beside Horace | Raspberry Pi Zero-form-factor board | <span class="htc-badge htc-badge--done">On hand</span> |
@@ -27,8 +27,8 @@ Everything the rover is (or will be) made of, photographed on the workbench as p
     <figcaption><strong>Top deck & pinout silkscreen:</strong> Smoked acrylic window over the ESP32 General Driver for Robots board, 40-pin header legend (<code>5V / GND / RX / TX / SCL / SDA</code>), folding 2.4 GHz antenna, power switch, and 12.6 V charge jack.</figcaption>
   </figure>
   <figure class="htc-photo">
-    <img src="../assets/hardware/oled-ap-ugv.jpg" alt="Close-up of the WAVE ROVER OLED displaying AP:UGV, ST: OFF, MAC:24:DC:C3:C6:27:F4, V:12.39">
-    <figcaption><strong>Stock OLED status screen:</strong> <code>AP:UGV</code> (hotspot SSID), <code>ST: OFF</code> (station mode idle), <code>MAC:24:DC:C3:C6:27:F4</code>, and <code>V:12.39</code> across the 3S 18650 pack.</figcaption>
+    <img src="../assets/hardware/oled-ap-ugv.jpg" alt="Close-up of the WAVE ROVER OLED displaying AP:UGV, ST: OFF, MAC:XX:XX:XX:XX:XX:XX, V:12.39">
+    <figcaption><strong>Stock OLED status screen:</strong> <code>AP:UGV</code> (hotspot SSID), <code>ST: OFF</code> (station mode idle), <code>MAC:XX:XX:XX:XX:XX:XX</code>, and <code>V:12.39</code> across the 3S 18650 pack.</figcaption>
   </figure>
 </div>
 
