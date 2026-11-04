@@ -27,11 +27,11 @@ horaceTheCheese is a documented robotics build: a Waveshare WAVE ROVER 4WD chass
 <div class="htc-card" markdown>
 <span class="htc-card__num">1</span>
 
-### Chassis & motor control
+### [Chassis & motor control](stages/stage-1-chassis.md)
 
-ROS 2 ↔ ESP32 JSON bridge over UART. Keyboard teleop. First spin.
+ROS 2 ↔ ESP32 JSON bridge over Wi-Fi HTTP & UART. `HORACE LIVES` on the OLED, keyboard teleop, and first wheel spin.
 
-<span class="htc-badge htc-badge--planned">Planned</span>
+<span class="htc-badge htc-badge--done">Done</span>
 </div>
 
 <div class="htc-card" markdown>
@@ -89,9 +89,10 @@ Nav2 goal following. Point at the map; horace goes there.
 
 | Piece | Role | Status |
 | --- | --- | --- |
-| WAVE ROVER 4WD chassis | Motors + ESP32 running stock Waveshare firmware | On hand |
-| LD19 LiDAR | 2D scans for SLAM | Ordered |
-| Binocular stereo camera | Depth images + point clouds | Ordered |
-| Onboard host board | Runs the ROS 2 Jazzy stack | TBD |
+| WAVE ROVER 4WD chassis | Motors + ESP32 running stock Waveshare firmware (`AP:UGV`, `12.39 V`) | <span class="htc-badge htc-badge--done">Done · Rolling</span> |
+| LDROBOT D500 LiDAR Kit (LD19) | 360° 2D laser scans for SLAM | <span class="htc-badge htc-badge--done">On hand</span> |
+| Raspberry Pi Zero-class board | Compact Linux companion spotted on the bench | <span class="htc-badge htc-badge--done">On hand</span> |
+| Binocular stereo camera | Depth images + point clouds | <span class="htc-badge htc-badge--progress">Ordered</span> |
 
-Full shopping list lives on the [Hardware & BOM](hardware.md) page.
+Full shopping list and real workbench photos live on the [Hardware & BOM](hardware.md) page.
+

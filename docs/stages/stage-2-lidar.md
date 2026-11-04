@@ -1,6 +1,6 @@
 # Stage 2 · LiDAR bring-up <span class="htc-badge htc-badge--planned">Planned</span>
 
-Mount the LD19 on its yellow mast, spin it up, and turn sweeps of laser dots into the first 2D map of the room.
+Mount the **LDROBOT D500 LiDAR Kit (LD19)** — already waiting in its box on the workbench — onto the metal expansion deck, spin it up, and turn sweeps of laser dots into the first 2D map of the room.
 
 ## Goals
 

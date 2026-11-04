@@ -357,6 +357,40 @@
   text-align: center;
 }
 
+/* ---- Hardware photo cards & gallery ---- */
+.htc-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.4rem;
+  margin: 1.5rem 0;
+}
+
+.htc-photo {
+  background: var(--htc-cream);
+  border: var(--htc-border);
+  border-radius: 20px;
+  box-shadow: var(--htc-shadow);
+  overflow: hidden;
+  margin: 0;
+}
+
+.htc-photo img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  display: block;
+  border-bottom: var(--htc-border);
+}
+
+.htc-photo figcaption {
+  padding: 0.75rem 1rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--htc-ink);
+}
+
+
 /* Big page titles */
 .md-typeset h1:first-of-type {
   display: inline-block;

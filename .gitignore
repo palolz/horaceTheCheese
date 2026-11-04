@@ -2,3 +2,9 @@ site/
 __pycache__/
 *.pyc
 .DS_Store
+ros2/build/
+ros2/install/
+ros2/log/
+*.egg-info/
+.pytest_cache/
+

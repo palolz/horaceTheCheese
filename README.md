@@ -16,20 +16,46 @@ horaceTheCheese is a documented robotics build: a [Waveshare WAVE ROVER](https:/
 
 ## The six-stage roadmap
 
-| # | Stage | What "done" looks like |
-| --- | --- | --- |
-| 1 | **Chassis & motor control** | ROS 2 ↔ ESP32 JSON bridge over UART; keyboard teleop drives a commanded square |
-| 2 | **LiDAR bring-up** | LD19 publishing `/scan`; first 2D map with slam_toolbox |
-| 3 | **Binocular depth** | Stereo camera streaming depth images + point clouds over WiFi |
-| 4 | **Sensor fusion** | `robot_localization` EKF fusing IMU + wheel odometry, drift measured and tamed |
-| 5 | **Full SLAM** | RTAB-Map fusing LiDAR + vision into a persistent, loop-closing map |
-| 6 | **Autonomy** | Nav2 goal following: click the map, the rover drives there |
+| # | Stage | Status | What "done" looks like |
+| --- | --- | --- | --- |
+| 1 | **Chassis & motor control** | **Done** | ROS 2 ↔ ESP32 JSON bridge (`wave_rover_base`) over Wi-Fi HTTP & UART; `HORACE LIVES` OLED & keyboard teleop verified |
+| 2 | **LiDAR bring-up** | Next up (D500 on bench) | LDROBOT D500 (LD19) publishing `/scan`; first 2D map with `slam_toolbox` |
+| 3 | **Binocular depth** | Planned | Stereo camera streaming depth images + point clouds over WiFi |
+| 4 | **Sensor fusion** | Planned | `robot_localization` EKF fusing IMU + wheel odometry, drift measured and tamed |
+| 5 | **Full SLAM** | Planned | RTAB-Map fusing LiDAR + vision into a persistent, loop-closing map |
+| 6 | **Autonomy** | Planned | Nav2 goal following: click the map, the rover drives there |
+
+## Quickstart: Drive Horace right now (Stage 1)
+
+1. **Join the rover's Wi-Fi AP** (`UGV`, password `12345678`, rover IP `192.168.4.1`) or connect USB/UART serial (`115200` baud).
+2. **Build & launch `wave_rover_base`** in one terminal:
+   ```bash
+   source /opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh
+   conda activate ros_jazzy
+   cd ros2
+   colcon build
+   source install/setup.bash
+   ros2 launch wave_rover_bringup rover.launch.py transport:=http host:=192.168.4.1
+   ```
+3. **Run keyboard teleop** in a second terminal:
+   ```bash
+   source /opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh
+   conda activate ros_jazzy
+   ros2 run teleop_twist_keyboard teleop_twist_keyboard
+   ```
+4. **Or send raw HTTP JSON smoke-test commands** with `curl`:
+   ```bash
+   curl --globoff 'http://192.168.4.1/js?json={"T":3,"lineNum":0,"Text":"HORACE LIVES"}'
+   curl --globoff 'http://192.168.4.1/js?json={"T":1,"L":0.25,"R":0.25}'
+   curl --globoff 'http://192.168.4.1/js?json={"T":1,"L":0,"R":0}'
+   curl --globoff 'http://192.168.4.1/js?json={"T":-3}'
+   ```
 
 ## Repo layout
 
 ```
-docs/   MkDocs documentation site (the GitHub Pages source)
-ros2/   ROS 2 workspace skeleton — packages arrive with each stage
+docs/   MkDocs documentation site + hardware photos (the GitHub Pages source)
+ros2/   ROS 2 Jazzy workspace (wave_rover_base + wave_rover_bringup)
 ```
 
 ## Design language

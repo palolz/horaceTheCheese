@@ -8,9 +8,9 @@ The build is chopped into six stages, each ending with something you can *see* t
 
 ### [Chassis & motor control](stage-1-chassis.md)
 
-ROS 2 talks JSON to the stock ESP32 firmware over UART. Keyboard teleop.
+ROS 2 talks JSON to the stock ESP32 firmware over Wi-Fi HTTP and UART. `HORACE LIVES` on the OLED and keyboard teleop verified.
 
-<span class="htc-badge htc-badge--planned">Planned</span>
+<span class="htc-badge htc-badge--done">Done</span>
 </div>
 
 <div class="htc-card" markdown>

@@ -6,29 +6,30 @@ Three computers, three jobs. The ESP32 drives motors and reads the IMU. The onbo
 
 ```mermaid
 flowchart LR
-    subgraph ROVER["🚗 WAVE ROVER"]
+    subgraph ROVER["🚗 WAVE ROVER (192.168.4.1 / UART)"]
         subgraph ESP["ESP32 · stock Waveshare firmware"]
-            IMU["9-axis IMU"]
-            MOTORS["4× DC motors + encoders"]
+            IMU["9-axis IMU + 3S battery monitor"]
+            OLED["OLED status / T:3 text"]
+            MOTORS["4× DC motors"]
         end
-        subgraph HOST["Onboard host board · ROS 2 Jazzy"]
-            BASE["wave_rover_base<br/>serial bridge"]
-            LIDAR["LD19 driver<br/>/scan"]
+        subgraph HOST["Mac (Stage 1 Wi-Fi) / Onboard host (UART) · ROS 2 Jazzy"]
+            BASE["wave_rover_base<br/>HTTP + Serial JSON bridge"]
+            LIDAR["LD19 / D500 driver<br/>/scan"]
             CAM["stereo camera driver<br/>depth + /points"]
             EKF["robot_localization<br/>EKF"]
             SLAM["slam_toolbox → RTAB-Map"]
             NAV["Nav2"]
         end
     end
-    subgraph MAC["Mac · WiFi"]
+    subgraph MAC["Operator · ROS 2 tools"]
         VIZ["Foxglove / RViz"]
-        TELEOP["keyboard teleop"]
+        TELEOP["teleop_twist_keyboard"]
     end
 
-    MOTORS <-->|"JSON over UART"| BASE
-    IMU -->|"/imu/data_raw"| BASE
-    BASE -->|"/odom"| EKF
-    BASE -->|"/imu"| EKF
+    MOTORS <-->|"T:1 JSON (HTTP or UART)"| BASE
+    OLED <-->|"T:3 / T:-3"| BASE
+    IMU -->|"T:126 / T:130"| BASE
+    BASE -->|"/imu/data_raw + /battery_state"| EKF
     LIDAR --> SLAM
     CAM --> SLAM
     EKF -->|"/odometry/filtered"| SLAM
