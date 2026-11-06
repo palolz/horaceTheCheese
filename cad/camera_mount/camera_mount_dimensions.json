@@ -1,0 +1,77 @@
+{
+  "parameters_mm": {
+    "pcb_width": 95.0,
+    "pcb_height": 20.0,
+    "pcb_thickness": 1.6,
+    "pcb_clearance": 0.5,
+    "lens_baseline": 80.0,
+    "lens_base_size": 14.0,
+    "lens_barrel_dia": 14.0,
+    "lens_cap_dia": 15.0,
+    "lens_visor_bore_dia": 16.6,
+    "lens_total_protrusion": 19.0,
+    "hole_outer_x": 46.0,
+    "hole_inner_outer_x": 26.1,
+    "hole_inner_inner_x": 22.1,
+    "hole_y": 8.5,
+    "pcb_m2_hole_dia": 2.0,
+    "tab_thickness": 2.0,
+    "tab_width": 44.88,
+    "tab_height_above_deck": 19.63,
+    "tab_top_bar_height": 4.22,
+    "tab_hole_spacing_min": 20.0,
+    "tab_hole_spacing_dxf": 21.0,
+    "tab_hole_dia": 2.4,
+    "tab_notch_inner_x": 5.89,
+    "tab_notch_outer_x": 9.01,
+    "tab_window_width": 25.75,
+    "tab_window_height": 8.1,
+    "usb_port_width": 7.0,
+    "usb_bay_inner_width": 13.0,
+    "usb_bay_inner_depth": 9.0,
+    "usb_clamp_length": 16.0,
+    "usb_plug_width": 10.2,
+    "usb_plug_depth": 7.0,
+    "usb_cable_dia": 4.5,
+    "wall_thickness": 2.5,
+    "corner_radius": 4.2,
+    "back_thickness": 5.0,
+    "pcb_recess_depth": 1.8,
+    "shell_front_z": 8.2
+  },
+  "files": {
+    "horace_cam_back_mount.stl": {
+      "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_back_mount.stl",
+      "watertight": true,
+      "bounding_box_mm": [
+        101.0,
+        42.0,
+        17.8
+      ],
+      "volume_cm3": 14.45,
+      "triangles": 6982
+    },
+    "horace_cam_front_visor.stl": {
+      "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_front_visor.stl",
+      "watertight": true,
+      "bounding_box_mm": [
+        102.0,
+        26.0,
+        14.5
+      ],
+      "volume_cm3": 12.5,
+      "triangles": 4554
+    },
+    "horace_cam_usb_shim.stl": {
+      "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_usb_shim.stl",
+      "watertight": true,
+      "bounding_box_mm": [
+        13.65,
+        8.7,
+        14.0
+      ],
+      "volume_cm3": 0.67,
+      "triangles": 712
+    }
+  }
+}

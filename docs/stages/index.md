@@ -28,9 +28,9 @@ LD19 scans hit `/scan`; slam_toolbox draws the first map.
 
 ### [Binocular depth](stage-3-depth.md)
 
-Stereo camera onboard, depth + point clouds over WiFi.
+`95 × 20 mm` stereo camera (`80.0 mm` baseline) housed in a 3D-printable retro visor + 90° bracket mount with Mini-USB strain relief.
 
-<span class="htc-badge htc-badge--planned">Planned</span>
+<span class="htc-badge htc-badge--progress">In progress · CAD ready</span>
 </div>
 
 <div class="htc-card" markdown>
