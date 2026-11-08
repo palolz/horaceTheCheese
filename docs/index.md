@@ -47,11 +47,11 @@ LD19 publishing `/scan`. First 2D map with slam_toolbox.
 <div class="htc-card" markdown>
 <span class="htc-card__num">3</span>
 
-### [Binocular depth](stages/stage-3-depth.md)
+### Binocular depth
 
-`95 × 20 mm` stereo camera (`80 mm` baseline) in a 3D-printable retro visor + 90° tab mount (`cad/camera_mount/`).
+Stereo camera streaming depth images and point clouds over WiFi.
 
-<span class="htc-badge htc-badge--progress">In progress · CAD ready</span>
+<span class="htc-badge htc-badge--planned">Planned</span>
 </div>
 
 <div class="htc-card" markdown>
@@ -92,7 +92,7 @@ Nav2 goal following. Point at the map; horace goes there.
 | WAVE ROVER 4WD chassis | Motors + ESP32 running stock Waveshare firmware (`AP:UGV`, `12.39 V`) | <span class="htc-badge htc-badge--done">Done · Rolling</span> |
 | LDROBOT D500 LiDAR Kit (LD19) | 360° 2D laser scans for SLAM | <span class="htc-badge htc-badge--done">On hand</span> |
 | Raspberry Pi Zero-class board | Compact Linux companion spotted on the bench | <span class="htc-badge htc-badge--done">On hand</span> |
-| Binocular stereo camera | `95 × 20 mm` PCB (`80.0 mm` baseline, Mini-USB) + 3D-printable visor & 90° bracket mount | <span class="htc-badge htc-badge--progress">On hand · CAD ready</span> |
+| Binocular stereo camera | Depth images + point clouds | <span class="htc-badge htc-badge--progress">Ordered</span> |
 
 Full shopping list and real workbench photos live on the [Hardware & BOM](hardware.md) page.
 

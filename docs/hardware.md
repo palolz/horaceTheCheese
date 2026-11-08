@@ -8,8 +8,7 @@ Everything the rover is (or will be) made of, photographed on the workbench as p
 | Metal top expansion plate | Slotted anodized mounting deck + standoffs for LiDAR & compute | Bundled with WAVE ROVER | <span class="htc-badge htc-badge--done">On hand</span> |
 | 2D LiDAR kit | 360° laser scans for Stage 2 SLAM | **LDROBOT D500 LiDAR Kit** (LD19 / DTOFLiDAR) | <span class="htc-badge htc-badge--done">On hand</span> |
 | Companion SBC (bench candidate) | Compact Linux board spotted on the cutting mat beside Horace | Raspberry Pi Zero-form-factor board | <span class="htc-badge htc-badge--done">On hand</span> |
-| Binocular stereo camera | Dual-M12 stereo camera module (`95.0 × 20.0 × 1.6 mm` PCB, **`80.0 mm` lens baseline**, bottom-center Mini-USB) | USB UVC Binocular Stereo Camera | <span class="htc-badge htc-badge--done">On hand</span> |
-| Stereo camera enclosure & mount | 3-part support-free 3D-printable housing (`horace_cam_back_mount.stl`, `horace_cam_front_visor.stl`, `horace_cam_usb_shim.stl`) with 90° bracket anti-rotation keys & Mini-USB clamp | Designed in-house ([`cad/camera_mount/`](stages/stage-3-depth.md#3d-printable-stereo-camera-enclosure-mount-cadcamera_mount)) | <span class="htc-badge htc-badge--progress">CAD ready</span> |
+| Binocular stereo camera | Depth images + point clouds | TBD (unit ordered) | <span class="htc-badge htc-badge--progress">Ordered</span> |
 | LiDAR mast + mounts | Yellow mast, printed brackets | 3D-printed, designed in-house | <span class="htc-badge htc-badge--planned">Planned</span> |
 
 ## Workbench gallery
@@ -39,15 +38,4 @@ Everything the rover is (or will be) made of, photographed on the workbench as p
 - **40-pin header silkscreen:** The top deck clearly labels the expansion header pins needed for Stage 1–3 wiring — `5V`, `3V3`, `GND`, `RX`, `TX` (3.3 V UART to the ESP32), and `SCL` / `SDA` (I²C bus).
 - **UniFi Wi-Fi 7 (`T:404`) compatibility:** The ESP32's 2.4 GHz radio needs a **WPA2-PSK (PMF Disabled)** 2.4 GHz SSID if switching from `AP:UGV` to home-network station mode (`T:404`).
 - **Power budget:** Full 3S 18650 charge reads `12.39 V` under idle OLED/Wi-Fi load; onboard buck converters feed the 5 V and 3.3 V rails on the 40-pin header.
-
-## Stereo camera & 90° front bracket metrology (`cad/camera_mount/`)
-
-We extracted exact dimensions from Waveshare's factory `WAVE_ROVER-EP_DXF` drawing and the 5×5 mm grid reference photos (`P1044915.JPG`–`P1044928.JPG`) to design a custom 3D-printable stereo camera enclosure that bolts directly onto the expansion plate's 90° upturned front tab:
-
-- **Stereo PCB:** `95.0 × 20.0 × 1.6 mm`, **`80.0 mm` center-to-center lens baseline** (`X = ±40.0 mm`), `14 × 14 mm` M12 lens bases (`19.0 mm` height with caps), `92.0 × 17.0 mm` outer M2 holes, and a bottom-center Mini-USB port (`X = 0.0 mm`).
-- **90° upturned front bracket:** `44.88 mm` wide × `19.63 mm` tall × `2.00 mm` thick, two M2 mounting holes spaced `20.0–21.0 mm` C-to-C, and two `3.12 mm`-wide inner "half-square" notches at `X = ±7.45 mm` engaged by raised anti-rotation keys on `horace_cam_back_mount.stl`.
-- **Download STLs & full documentation:** See [Stage 3 · Binocular depth](stages/stage-3-depth.md#3d-printable-stereo-camera-enclosure-mount-cadcamera_mount) or grab [`horace_cam_back_mount.stl`](assets/cad/horace_cam_back_mount.stl), [`horace_cam_front_visor.stl`](assets/cad/horace_cam_front_visor.stl), and [`horace_cam_usb_shim.stl`](assets/cad/horace_cam_usb_shim.stl) directly.
-
-![3D preview sheet of the stereo camera mount and exploded assembly](assets/cad/camera-mount-render.png)
-
 
