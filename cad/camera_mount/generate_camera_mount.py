@@ -72,12 +72,21 @@ class CameraMountParams:
     usb_plug_depth: float = 7.0        # mm default Mini-USB plug overmold depth (for shim)
     usb_cable_dia: float = 4.5         # mm round USB cable neck diameter (for shim)
 
-    # --- 4. Enclosure Shell & Retro Visor Styling ---
-    wall_thickness: float = 2.5        # mm perimeter wall
-    corner_radius: float = 4.2         # mm outer rounded corner radius
-    back_thickness: float = 5.0        # mm z=0 (rear face) to z=5.0 (PCB rear support plane)
-    pcb_recess_depth: float = 1.8      # mm SMD clearance pocket behind PCB (z=3.2 to 5.0)
-    shell_front_z: float = 8.2         # mm top of rear shell perimeter walls (cradles 1.6mm PCB)
+    # --- 4. Enclosure Shell, Structural Gussets & Heat-Set Threaded Inserts (v2) ---
+    wall_thickness: float = 3.2        # mm reinforced perimeter wall (up from 2.5 mm)
+    corner_radius: float = 4.8         # mm outer rounded corner radius
+    back_thickness: float = 6.8        # mm z=0 (flat rear bed face) to z=6.8 (PCB rear seating plane)
+    pcb_recess_depth: float = 1.4      # mm SMD clearance pocket behind PCB (z=5.4 to 6.8 -> 5.4 mm solid floor!)
+    shell_front_z: float = 9.8         # mm top of rear shell perimeter walls (cradles 1.6mm PCB at z=6.8..8.4)
+
+    # Heat-set brass threaded insert specs (NO hex nut recesses!)
+    m3_insert_bore_dia: float = 4.0    # mm standard melt bore for M3 brass heat-set inserts (OD 4.5-5.0 mm)
+    m3_insert_depth: float = 6.5       # mm bore depth for M3 x 4/5/6 mm inserts
+    m3_clearance_dia: float = 3.4      # mm M3 screw clearance through-hole
+    m2_insert_bore_dia: float = 3.2    # mm standard melt bore for M2 brass heat-set inserts (OD 3.2-3.5 mm)
+    m2_insert_depth: float = 4.5       # mm bore depth for M2 x 3/4 mm inserts
+    pcb_locator_pin_dia: float = 1.85  # mm press-fit locating pin for Ø2.0 mm inner PCB holes
+    outer_m3_ear_x: float = 51.5       # mm (+-51.5 mm = 103.0 mm C-to-C outer M3 cover-to-cover bolts)
 
 
 def rounded_rect_prism(
@@ -146,31 +155,87 @@ def stadium_slot_z(
     )
 
 
-def hex_nut_prism_z(
-    flat_to_flat: float,
+def polygon_prism_z(
+    points_xy: list[Tuple[float, float]],
     depth: float,
-    cx: float = 0.0,
-    cy: float = 0.0,
     z0: float = 0.0,
 ) -> mf.Manifold:
-    """Create a regular hexagon nut trap along Z with given across-flats width."""
-    r_circum = flat_to_flat / math.sqrt(3.0)
-    pts = [
-        [cx + r_circum * math.cos(i * math.pi / 3.0), cy + r_circum * math.sin(i * math.pi / 3.0)]
-        for i in range(6)
-    ]
-    cross = mf.CrossSection([np.array(pts, dtype=np.float32)])
+    """Extrude a 2D polygon in X-Y from z=z0 to z=z0+depth (auto-orienting CCW)."""
+    arr = np.array(points_xy, dtype=np.float32)
+    # Signed area via shoelace formula; reverse if clockwise so Manifold treats it as solid
+    x, y = arr[:, 0], arr[:, 1]
+    area2 = float(np.sum(x * np.roll(y, -1) - np.roll(x, -1) * y))
+    if area2 < 0.0:
+        arr = arr[::-1].copy()
+    cross = mf.CrossSection([arr])
     return mf.Manifold.extrude(cross, depth).translate([0.0, 0.0, z0])
 
 
+def blind_insert_bore_from_top_z(
+    bore_dia: float,
+    depth: float,
+    z_top: float,
+    cx: float,
+    cy: float,
+    chamfer_extra: float = 0.8,
+    chamfer_depth: float = 0.6,
+    segments: int = 48,
+) -> mf.Manifold:
+    """Create a blind heat-set insert bore opening at z=z_top and going down (-Z) by `depth`.
+
+    Includes a 45-deg soldering-iron alignment lead-in chamfer at the top mouth and a
+    stepped/conical bottom relief so displaced molten plastic never blocks full insertion.
+    """
+    r_bore = bore_dia * 0.5
+    r_chamfer = (bore_dia + chamfer_extra) * 0.5
+    z_bot = z_top - depth
+    main_cyl = mf.Manifold.cylinder(depth + 0.05, r_bore, r_bore, segments).translate([cx, cy, z_bot])
+    lead_in = mf.Manifold.cylinder(
+        chamfer_depth + 0.05, r_bore, r_chamfer, segments
+    ).translate([cx, cy, z_top - chamfer_depth])
+    bottom_cone = mf.Manifold.cylinder(
+        r_bore * 0.8, 0.2, r_bore, segments
+    ).translate([cx, cy, z_bot - r_bore * 0.8 + 0.02])
+    return main_cyl + lead_in + bottom_cone
+
+
+def blind_insert_bore_from_bottom_z(
+    bore_dia: float,
+    depth: float,
+    cx: float,
+    cy: float,
+    z0: float = 0.0,
+    chamfer_extra: float = 0.8,
+    chamfer_depth: float = 0.6,
+    segments: int = 48,
+) -> mf.Manifold:
+    """Create a blind heat-set insert bore opening on the flat build plate z=z0 going up (+Z).
+
+    Terminates in a 45-deg self-supporting conical drill-point tip at the top so it prints
+    100% support-free on an FDM printer with zero flat horizontal ceiling!
+    """
+    r_bore = bore_dia * 0.5
+    r_chamfer = (bore_dia + chamfer_extra) * 0.5
+    main_cyl = mf.Manifold.cylinder(depth, r_bore, r_bore, segments).translate([cx, cy, z0 - 0.02])
+    lead_in = mf.Manifold.cylinder(
+        chamfer_depth + 0.02, r_chamfer, r_bore, segments
+    ).translate([cx, cy, z0 - 0.02])
+    top_cone = mf.Manifold.cylinder(
+        r_bore, r_bore, 0.15, segments
+    ).translate([cx, cy, z0 + depth - 0.02])
+    return main_cyl + lead_in + top_cone
+
+
 def build_back_mount(p: CameraMountParams) -> mf.Manifold:
-    """Build `horace_cam_back_mount.stl` (Print flat on Z=0 with zero supports)."""
+    """Build `horace_cam_back_mount_v2.stl` (100% flat Z=0 rear face, M3/M2 heat-set inserts, zero hex nuts)."""
     cav_w = p.pcb_width + 2.0 * p.pcb_clearance   # 96.0 mm
     cav_h = p.pcb_height + 2.0 * p.pcb_clearance  # 21.0 mm
-    outer_w = cav_w + 2.0 * p.wall_thickness      # 101.0 mm
-    outer_h = cav_h + 2.0 * p.wall_thickness      # 26.0 mm
+    # Widen outer shell to 111.0 x 27.4 mm so 4x M3 heat-set insert bosses sit at X = +-51.5 mm outside the PCB!
+    outer_w = 2.0 * p.outer_m3_ear_x + 8.0        # 111.0 mm
+    outer_h = cav_h + 2.0 * p.wall_thickness      # 27.4 mm
 
-    # 1. Main rear enclosure body (z = 0.0 to shell_front_z = 8.2 mm)
+    # 1. Main upper camera housing body (z = 0.0 to shell_front_z = 9.8 mm)
+    # Entire rear face at z = 0.0 mm is 100% flat on the print bed!
     body = rounded_rect_prism(
         width=outer_w,
         height=outer_h,
@@ -180,38 +245,82 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
         z0=0.0,
     )
 
-    # 2. Integrated Mini-USB strain-relief collar extending below bottom wall (y = -13.0 to -29.0 mm)
-    clamp_outer_w = p.usb_bay_inner_width + 6.0  # 19.0 mm
-    clamp_y_top = -outer_h * 0.5 + 1.0           # overlaps bottom wall by 1.0 mm
-    clamp_y_bot = -outer_h * 0.5 - p.usb_clamp_length
-    clamp_h = clamp_y_top - clamp_y_bot
-    clamp_yc = 0.5 * (clamp_y_top + clamp_y_bot)
-    clamp_z_top = p.back_thickness + p.pcb_thickness + p.usb_bay_inner_depth + 2.2  # 17.8 mm
+    # 2. Structural Gusset Wings & Wide Lower Bracket Spine (y = -25.5 to -10.0 mm)
+    # Eliminates the v1 narrow neck weak point by sweeping a 34 mm wide lower bracket block
+    # smoothly out to X = +-44.0 mm on the main camera body, plus raised diagonal gusset ribs!
+    spine_y_bot = -25.5
+    spine_y_top = -10.0
+    gusset_poly = [
+        (-44.0, -11.5),
+        (+44.0, -11.5),
+        (+27.0, -18.5),
+        (+17.0, spine_y_bot),
+        (-17.0, spine_y_bot),
+        (-27.0, -18.5),
+    ]
+    gusset_plate = polygon_prism_z(gusset_poly, depth=p.back_thickness + 0.8, z0=0.0)
+
+    # Central reinforced bracket & Mini-USB spine block (34.0 mm wide at top, 28.0 mm at bottom, z = 0..10.5 mm)
+    spine_block = rounded_rect_prism(
+        width=31.0,
+        height=spine_y_top - spine_y_bot + 2.0,
+        depth=10.5,
+        radius=3.2,
+        center_xy=(0.0, 0.5 * (spine_y_top + spine_y_bot)),
+        z0=0.0,
+    )
+
+    # Two raised diagonal stiffening ribs (z = 0.0 to shell_front_z = 9.8 mm) triangulating bracket to camera wings
+    left_rib_pts = [
+        (-13.5, -24.5),
+        (-9.5, -24.5),
+        (-33.0, -11.5),
+        (-39.5, -11.5),
+    ]
+    right_rib_pts = [
+        (+9.5, -24.5),
+        (+13.5, -24.5),
+        (+39.5, -11.5),
+        (+33.0, -11.5),
+    ]
+    left_rib = polygon_prism_z(left_rib_pts, depth=p.shell_front_z, z0=0.0)
+    right_rib = polygon_prism_z(right_rib_pts, depth=p.shell_front_z, z0=0.0)
+    body = body + gusset_plate + spine_block + left_rib + right_rib
+
+    # 3. Integrated Mini-USB strain-relief collar & M3 Heat-Set Insert Pinch Jaws
+    clamp_outer_w = p.usb_bay_inner_width + 7.0  # 20.0 mm outer collar width
+    clamp_y_top = -outer_h * 0.5 + 1.5           # overlaps bottom wall
+    clamp_y_bot = spine_y_bot                    # -25.5 mm (flush with bottom of bracket spine)
+    clamp_h = clamp_y_top - clamp_y_bot          # 13.3 mm
+    clamp_yc = 0.5 * (clamp_y_top + clamp_y_bot) # -18.85 mm
+    clamp_z_top = p.back_thickness + p.pcb_thickness + p.usb_bay_inner_depth + 1.4  # 18.8 mm
 
     usb_collar = rounded_rect_prism(
         width=clamp_outer_w,
         height=clamp_h,
         depth=clamp_z_top,
-        radius=2.8,
+        radius=3.0,
         center_xy=(0.0, clamp_yc),
         z0=0.0,
     )
 
-    # M3 pinch-clamp ears on the lower USB collar (x = -13.5..+13.5 mm, y = -23.5..-16.5 mm, z = 5.0..16.5 mm)
-    ear_w = clamp_outer_w + 8.0  # 27.0 mm across ears
-    ear_h = 7.2
-    ear_yc = clamp_yc - 1.0
-    pinch_ears = rounded_rect_prism(
-        width=ear_w,
-        height=ear_h,
-        depth=11.0,
-        radius=2.2,
-        center_xy=(0.0, ear_yc),
-        z0=5.5,
+    # Reinforced M3 pinch-clamp jaws (30.0 mm wide across jaws, housing an M3 brass heat-set insert on the right jaw!)
+    jaw_w = 30.0
+    jaw_h = 8.4
+    jaw_yc = clamp_yc - 0.8
+    jaw_z0 = 7.2
+    jaw_depth = 10.6  # z = 7.2 to 17.8 mm
+    pinch_jaws = rounded_rect_prism(
+        width=jaw_w,
+        height=jaw_h,
+        depth=jaw_depth,
+        radius=2.4,
+        center_xy=(0.0, jaw_yc),
+        z0=jaw_z0,
     )
-    body = body + usb_collar + pinch_ears
+    body = body + usb_collar + pinch_jaws
 
-    # 3. Cut out the PCB cradle cavity (z = p.back_thickness [5.0] to shell_front_z + 1)
+    # 4. Cut out the PCB cradle cavity (96.0 x 21.0 mm, from z = p.back_thickness [6.8] to shell_front_z + 1)
     pcb_pocket = rounded_rect_prism(
         width=cav_w,
         height=cav_h,
@@ -222,53 +331,127 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
     )
     body = body - pcb_pocket
 
-    # 4. Cut out the deeper rear SMD clearance pocket (z = 3.2 to 5.0 mm) leaving a 1.2 mm perimeter ledge
+    # 5. Cut out the rear SMD clearance pocket (z = 5.4 to 6.8 mm -> leaves a 5.4 mm solid backplate!)
+    smd_floor_z = p.back_thickness - p.pcb_recess_depth  # 5.4 mm
     smd_pocket = rounded_rect_prism(
-        width=p.pcb_width - 2.4,
-        height=p.pcb_height - 2.4,
+        width=p.pcb_width - 4.0,
+        height=p.pcb_height - 3.4,
         depth=p.pcb_recess_depth + 0.5,
         radius=1.5,
         center_xy=(0.0, 0.0),
-        z0=p.back_thickness - p.pcb_recess_depth,
+        z0=smd_floor_z,
     )
     body = body - smd_pocket
 
-    # 5. Add the 8 M2 PCB support bosses rising from z=3.2 to z=5.0 mm (plus 1.2mm locator lip for inner holes)
-    boss_coords = [
-        (-p.hole_outer_x, +p.hole_y),
-        (+p.hole_outer_x, +p.hole_y),
-        (-p.hole_outer_x, -p.hole_y),
-        (+p.hole_outer_x, -p.hole_y),
-        (-p.hole_inner_inner_x, +p.hole_y),
-        (+p.hole_inner_inner_x, +p.hole_y),
-        (-p.hole_inner_inner_x, -p.hole_y),
-        (+p.hole_inner_inner_x, -p.hole_y),
-    ]
-    for bx, by in boss_coords:
-        body = body + cylinder_z(dia=5.0, depth=p.pcb_recess_depth, cx=bx, cy=by, z0=p.back_thickness - p.pcb_recess_depth)
+    # Add internal stiffening ribs & PCB seating bosses inside the SMD pocket:
+    # - Central bridge rib (X = -14..+14 mm, Z = 5.4..6.8 mm) behind bare center of PCB
+    center_pad = rounded_rect_prism(
+        width=26.0,
+        height=cav_h,
+        depth=p.pcb_recess_depth,
+        radius=1.5,
+        center_xy=(0.0, 0.0),
+        z0=smd_floor_z,
+    )
+    body = body + center_pad
 
-    # Also add support pads at the second inner hole pair (+-26.1 mm)
+    # - 4x Corner PCB Bosses at X = +-46.0, Y = +-8.5 mm (Ø6.4 mm pads up to z=6.8 mm)
+    for bx in (-p.hole_outer_x, +p.hole_outer_x):
+        for by in (-p.hole_y, +p.hole_y):
+            body = body + cylinder_z(dia=6.4, depth=p.pcb_recess_depth, cx=bx, cy=by, z0=smd_floor_z)
+
+    # - 8x Inner FFC-flanking PCB Support Bosses at X = +-26.1 and +-22.1 mm, Y = +-8.5 mm
+    for bx in (-p.hole_inner_outer_x, +p.hole_inner_outer_x, -p.hole_inner_inner_x, +p.hole_inner_inner_x):
+        for by in (-p.hole_y, +p.hole_y):
+            body = body + cylinder_z(dia=5.2, depth=p.pcb_recess_depth, cx=bx, cy=by, z0=smd_floor_z)
+
+    # - 4x Integrated Press-Fit PCB Locating Pins (Ø1.85 mm x 2.2 mm tall) at X = +-26.1, Y = +-8.5 mm
+    #   Drops straight into four of the PCB's Ø2.0 mm holes so no tiny M2 nuts/bolts are required!
     for bx in (-p.hole_inner_outer_x, +p.hole_inner_outer_x):
         for by in (-p.hole_y, +p.hole_y):
-            body = body + cylinder_z(dia=4.6, depth=p.pcb_recess_depth, cx=bx, cy=by, z0=p.back_thickness - p.pcb_recess_depth)
+            pin_base = mf.Manifold.cylinder(1.5, p.pcb_locator_pin_dia * 0.5, p.pcb_locator_pin_dia * 0.5, 36).translate(
+                [bx, by, p.back_thickness - 0.1]
+            )
+            pin_tip = mf.Manifold.cylinder(0.8, p.pcb_locator_pin_dia * 0.5, 0.72, 36).translate(
+                [bx, by, p.back_thickness + 1.4]
+            )
+            body = body + pin_base + pin_tip
 
-    # Drill M2 pilot/through holes + rear hex nut traps in the 8 main PCB bosses
-    for bx, by in boss_coords:
-        body = body - cylinder_z(dia=p.pcb_m2_hole_dia, depth=p.shell_front_z + 2.0, cx=bx, cy=by, z0=-0.5)
-        body = body - hex_nut_prism_z(flat_to_flat=4.3, depth=1.8, cx=bx, cy=by, z0=-0.01)
+    # 6. HEAT-SET THREADED INSERT BORES (ZERO HEX NUT RECESSES!)
+    # 6a. 4x Outer Corner M3 Heat-Set Insert Bosses (X = +-51.5 mm, Y = +-8.5 mm, Ø4.0 mm bore x 6.5 mm deep)
+    #     Reinforce the 4 outer corners with Ø9.2 mm cylindrical bosses blended into the outer end walls.
+    for ex in (-p.outer_m3_ear_x, +p.outer_m3_ear_x):
+        for ey in (-p.hole_y, +p.hole_y):
+            body = body + cylinder_z(dia=9.2, depth=p.shell_front_z, cx=ex, cy=ey, z0=0.0)
+            body = body - blind_insert_bore_from_top_z(
+                bore_dia=p.m3_insert_bore_dia,
+                depth=p.m3_insert_depth,
+                z_top=p.shell_front_z,
+                cx=ex,
+                cy=ey,
+            )
 
-    # 6. Carve the Mini-USB plug tunnel & receptacle passage
-    # Receptacle neck from PCB (y = -13.5..-9.0, z = 4.8..12.5)
+    # 6b. 4x PCB Corner M2 Heat-Set Insert Bores (X = +-46.0 mm, Y = +-8.5 mm, Ø3.2 mm bore x 4.5 mm deep)
+    #     Blind from z = 6.8 mm down to z = 2.3 mm (leaves 2.3 mm solid sealed floor at z=0!).
+    for bx in (-p.hole_outer_x, +p.hole_outer_x):
+        for by in (-p.hole_y, +p.hole_y):
+            body = body - blind_insert_bore_from_top_z(
+                bore_dia=p.m2_insert_bore_dia,
+                depth=p.m2_insert_depth,
+                z_top=p.back_thickness,
+                cx=bx,
+                cy=by,
+                chamfer_extra=0.6,
+                chamfer_depth=0.5,
+            )
+
+    # 6c. 90° Metal Bracket Heat-Set Insert Bores on the Flat Rear Face (z = 0.0 mm):
+    #   - 2x M3 Heat-Set Insert Bores (Ø4.0 mm x 6.5 mm deep) at X = +-10.00 mm, Y = -14.00 mm
+    #     (Centered inside the metal bracket's 25.75 x 9.30 mm U-window for 100% M3 hardware setup!)
+    #   - 2x M2 Heat-Set Insert Bores (Ø3.2 mm x 4.5 mm deep) at X = +-10.25 mm, Y = -6.65 mm
+    #     (Aligned directly with the metal bracket's 2x Ø2.3 mm top crossbar holes!)
+    #   - 2x Anti-Rotation Key Sockets (2.75 x 2.8 x 3.2 mm with 45-deg roof) at X = +-7.45 mm, Y = -7.70 mm
+    #     (Aligned with the metal bracket's 2x 3.12 mm inner half-square notches!)
+    for sign in (-1.0, +1.0):
+        # M3 U-window insert bore (Ø4.0 mm x 6.5 mm deep + 45-deg conical roof)
+        body = body - blind_insert_bore_from_bottom_z(
+            bore_dia=p.m3_insert_bore_dia,
+            depth=p.m3_insert_depth,
+            cx=sign * 10.00,
+            cy=-14.00,
+            z0=0.0,
+        )
+        # M2 top crossbar insert bore (Ø3.2 mm x 4.5 mm deep + 45-deg conical roof)
+        body = body - blind_insert_bore_from_bottom_z(
+            bore_dia=p.m2_insert_bore_dia,
+            depth=p.m2_insert_depth,
+            cx=sign * 10.25,
+            cy=-6.65,
+            z0=0.0,
+            chamfer_extra=0.6,
+            chamfer_depth=0.5,
+        )
+        # Anti-rotation notch alignment socket (Ø2.8 mm x 3.2 mm deep at X = +-7.45 mm, Y = -7.70 mm)
+        body = body - blind_insert_bore_from_bottom_z(
+            bore_dia=2.8,
+            depth=3.2,
+            cx=sign * 7.45,
+            cy=-7.70,
+            z0=0.0,
+            chamfer_extra=0.5,
+            chamfer_depth=0.4,
+        )
+
+    # 7. Carve the Mini-USB plug tunnel & M3 Heat-Set Insert Pinch-Clamp Jaw Bores
     usb_neck = rounded_rect_prism(
         width=p.usb_port_width + 3.0,
         height=7.0,
-        depth=8.2,
+        depth=8.8,
         radius=1.0,
         center_xy=(0.0, -cav_h * 0.5),
-        z0=4.8,
+        z0=p.back_thickness - 0.4,
     )
-    # Main overmold bay inside the lower collar (13.0 x 9.0 mm, z = 5.6..14.6 mm)
-    usb_bay_z0 = p.back_thickness + 0.6
+    usb_bay_z0 = p.back_thickness + 0.6  # z = 7.4..16.4 mm (well in front of the z=0..6.8 mm spine!)
     usb_bay = rounded_rect_prism(
         width=p.usb_bay_inner_width,
         height=clamp_h + 4.0,
@@ -277,123 +460,52 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
         center_xy=(0.0, clamp_yc),
         z0=usb_bay_z0,
     )
-    # Shim retention side grooves inside USB bay (14.2 mm wide x 3.0 mm tall at z = 8.6..11.6 mm)
     shim_groove = rounded_rect_prism(
         width=p.usb_bay_inner_width + 1.4,
-        height=clamp_h - 3.0,
+        height=clamp_h - 2.5,
         depth=3.0,
         radius=0.8,
         center_xy=(0.0, clamp_yc - 0.5),
         z0=usb_bay_z0 + 3.0,
     )
-    # Front flex slit (1.8 mm wide) through front of collar so M3 screw or zip-tie can pinch the plug
     flex_slit = rounded_rect_prism(
         width=1.8,
         height=clamp_h + 2.0,
-        depth=6.0,
+        depth=5.5,
         radius=0.4,
-        center_xy=(0.0, clamp_yc - 1.0),
+        center_xy=(0.0, clamp_yc - 0.8),
         z0=usb_bay_z0 + p.usb_bay_inner_depth - 1.0,
     )
     body = body - usb_neck - usb_bay - shim_groove - flex_slit
 
-    # M3 horizontal pinch bolt hole (along X at y = ear_yc, z = 11.0 mm) + hex nut trap on right ear
-    m3_cyl = cylinder_z(dia=3.3, depth=ear_w + 4.0, cx=0.0, cy=0.0, z0=-0.5 * (ear_w + 4.0))
-    # Rotate cylinder from Z axis to X axis (90 deg around Y)
-    m3_bolt = m3_cyl.rotate([0.0, 90.0, 0.0]).translate([0.0, ear_yc, 11.0])
-    m3_nut = (
-        hex_nut_prism_z(flat_to_flat=5.7, depth=3.0, cx=0.0, cy=0.0, z0=0.0)
+    # Horizontal M3 Pinch-Clamp Screw + M3 Heat-Set Insert (at y = jaw_yc, z = 12.6 mm):
+    # - Left jaw (X = -15.0..-0.9 mm): Ø3.4 mm M3 clearance hole + Ø6.4 mm socket head counterbore
+    # - Right jaw (X = +0.9..+15.0 mm): Ø4.0 mm M3 heat-set insert bore (7.0 mm deep from slit face X=+0.9
+    #   or outer face X=+15.0 -> pressing insert from outer right face X=+15.0 with Ø4.8 mm chamfer!)
+    bolt_z = 12.6
+    # Left jaw M3 clearance bore (from X = -16.0 to +2.0 mm)
+    left_m3_clear = (
+        cylinder_z(dia=p.m3_clearance_dia, depth=18.0, cx=0.0, cy=0.0, z0=-16.0)
         .rotate([0.0, 90.0, 0.0])
-        .translate([ear_w * 0.5 - 2.5, ear_yc, 11.0])
+        .translate([0.0, jaw_yc, bolt_z])
     )
-    body = body - m3_bolt - m3_nut
-
-    # Zip-tie channel wrapping around the USB collar at y = clamp_yc + 3.2 mm (4.2 mm tall groove)
-    ziptie_y = clamp_yc + 3.2
-    zip_left = rounded_rect_prism(width=2.0, height=4.2, depth=clamp_z_top + 1.0, radius=0.5, center_xy=(-clamp_outer_w * 0.5 + 0.6, ziptie_y), z0=-0.5)
-    zip_right = rounded_rect_prism(width=2.0, height=4.2, depth=clamp_z_top + 1.0, radius=0.5, center_xy=(+clamp_outer_w * 0.5 - 0.6, ziptie_y), z0=-0.5)
-    zip_front = rounded_rect_prism(width=clamp_outer_w + 2.0, height=4.2, depth=1.8, radius=0.5, center_xy=(0.0, ziptie_y), z0=clamp_z_top - 1.4)
-    zip_back_tunnel = rounded_rect_prism(width=clamp_outer_w + 2.0, height=4.2, depth=2.0, radius=0.5, center_xy=(0.0, ziptie_y), z0=2.2)
-    body = body - zip_left - zip_right - zip_front - zip_back_tunnel
-
-    # 7. WAVE ROVER Expansion Plate 90° Upturned Bracket Interface on Rear Face (z = 0.0 .. 2.1 mm)
-    # We recess a 2.10 mm deep seat for the 44.88 mm wide x 4.22 mm tall top crossbar of the upturned metal tab
-    # at y = -5.6 mm to -1.2 mm, WHILE LEAVING the two anti-rotation keys (at X = +-7.45 mm) and the lower
-    # U-window boss (X = -12.5..+12.5 mm) proud at z = 0.0 so they lock into the metal tab's square notches!
-    seat_w = p.tab_width + 0.52       # 45.40 mm (hugs 44.88 mm metal tab with 0.26 mm clearance per side)
-    seat_depth = p.tab_thickness + 0.10  # 2.10 mm deep into z=0..5.0 backplate
-    crossbar_y_top = -1.2             # top edge of upturned metal tab butts against this ledge
-    crossbar_y_bot = -5.5             # 4.3 mm tall crossbar seat
-
-    # Carve the top crossbar seat (y = -5.5 to -1.2 mm, x = -22.7 to +22.7 mm, z = 0 to 2.1 mm)
-    crossbar_seat = rounded_rect_prism(
-        width=seat_w,
-        height=crossbar_y_top - crossbar_y_bot,
-        depth=seat_depth + 0.02,
-        radius=0.8,
-        center_xy=(0.0, 0.5 * (crossbar_y_top + crossbar_y_bot)),
-        z0=-0.01,
+    left_m3_head = (
+        cylinder_z(dia=6.4, depth=3.0, cx=0.0, cy=0.0, z0=-16.5)
+        .rotate([0.0, 90.0, 0.0])
+        .translate([0.0, jaw_yc, bolt_z])
     )
-    # Carve the two side leg seats below the crossbar (x = -22.7..-13.0 and +13.0..+22.7 mm, y = -29.0..-5.0 mm)
-    leg_w = (seat_w - (p.tab_window_width + 0.25)) * 0.5
-    leg_x_center = 0.5 * (seat_w * 0.5 + (p.tab_window_width + 0.25) * 0.5)
-    left_leg_seat = rounded_rect_prism(
-        width=leg_w,
-        height=24.0,
-        depth=seat_depth + 0.02,
-        radius=0.6,
-        center_xy=(-leg_x_center, -17.0),
-        z0=-0.01,
+    # Right jaw M3 heat-set insert bore (Ø4.0 mm from X = +0.9 to +15.5 mm, with Ø4.8 mm chamfer on outer right face!)
+    right_m3_insert = (
+        cylinder_z(dia=p.m3_insert_bore_dia, depth=15.0, cx=0.0, cy=0.0, z0=0.8)
+        .rotate([0.0, 90.0, 0.0])
+        .translate([0.0, jaw_yc, bolt_z])
     )
-    right_leg_seat = rounded_rect_prism(
-        width=leg_w,
-        height=24.0,
-        depth=seat_depth + 0.02,
-        radius=0.6,
-        center_xy=(+leg_x_center, -17.0),
-        z0=-0.01,
+    right_m3_chamfer = (
+        mf.Manifold.cylinder(0.8, p.m3_insert_bore_dia * 0.5, (p.m3_insert_bore_dia + 0.8) * 0.5, 48)
+        .rotate([0.0, 90.0, 0.0])
+        .translate([jaw_w * 0.5 - 0.7, jaw_yc, bolt_z])
     )
-    body = body - crossbar_seat - left_leg_seat - right_leg_seat
-
-    # Add back the TWO ANTI-ROTATION KEYS that drop into the upturned tab's two "half-square" notches!
-    # DXF notch bounds: X = +-5.89 to +-9.01 mm (width = 3.12 mm, center = +-7.45 mm).
-    # We make each key 2.70 mm wide x 2.60 mm tall, extending from the lower window up into the notch at z = 0.0..2.10 mm!
-    key_xc = 0.5 * (p.tab_notch_inner_x + p.tab_notch_outer_x)  # 7.45 mm
-    key_w = (p.tab_notch_outer_x - p.tab_notch_inner_x) - 0.42  # 2.70 mm
-    for sign in (-1.0, +1.0):
-        anti_rot_key = rounded_rect_prism(
-            width=key_w,
-            height=3.0,
-            depth=seat_depth,
-            radius=0.5,
-            center_xy=(sign * key_xc, crossbar_y_bot + 0.9),
-            z0=0.0,
-        )
-        body = body + anti_rot_key
-
-    # Drill the two M2/M2.5 mounting slots through the crossbar seat (centered at X = +-10.25 mm, Y = -3.35 mm)
-    # Slot width = 3.5 mm covers both 20.0 mm grid spacing (X=+-10.0) and 21.0 mm DXF spacing (X=+-10.5)!
-    bolt_y = 0.5 * (crossbar_y_top + crossbar_y_bot)
-    bolt_xc = 0.25 * (p.tab_hole_spacing_min + p.tab_hole_spacing_dxf)  # 10.25 mm
-    for sign in (-1.0, +1.0):
-        slot = stadium_slot_z(
-            slot_width=3.5,
-            slot_height=p.tab_hole_dia,
-            depth=p.back_thickness + 2.0,
-            cx=sign * bolt_xc,
-            cy=bolt_y,
-            z0=-0.5,
-        )
-        # Captive M2 hex nut pocket on the inside of the backplate (z = 3.2..5.2 mm)
-        nut_pocket = rounded_rect_prism(
-            width=5.2,
-            height=4.5,
-            depth=2.2,
-            radius=0.6,
-            center_xy=(sign * bolt_xc, bolt_y),
-            z0=p.back_thickness - 1.9,
-        )
-        body = body - slot - nut_pocket
+    body = body - left_m3_clear - left_m3_head - right_m3_insert - right_m3_chamfer
 
     return body
 
@@ -565,8 +677,10 @@ def manifold_to_trimesh(m: mf.Manifold) -> trimesh.Trimesh:
 
 def generate_all(out_dir: Path, params: CameraMountParams) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
+    back_solid = build_back_mount(params)
     specs = [
-        ("horace_cam_back_mount.stl", build_back_mount(params)),
+        ("horace_cam_back_mount_v2.stl", back_solid),
+        ("horace_cam_back_mount.stl", back_solid),
         ("horace_cam_front_visor.stl", build_front_visor(params)),
         ("horace_cam_usb_shim.stl", build_usb_shim(params)),
     ]

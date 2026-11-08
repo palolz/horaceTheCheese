@@ -33,34 +33,52 @@
     "usb_plug_width": 10.2,
     "usb_plug_depth": 7.0,
     "usb_cable_dia": 4.5,
-    "wall_thickness": 2.5,
-    "corner_radius": 4.2,
-    "back_thickness": 5.0,
-    "pcb_recess_depth": 1.8,
-    "shell_front_z": 8.2
+    "wall_thickness": 3.2,
+    "corner_radius": 4.8,
+    "back_thickness": 6.8,
+    "pcb_recess_depth": 1.4,
+    "shell_front_z": 9.8,
+    "m3_insert_bore_dia": 4.0,
+    "m3_insert_depth": 6.5,
+    "m3_clearance_dia": 3.4,
+    "m2_insert_bore_dia": 3.2,
+    "m2_insert_depth": 4.5,
+    "pcb_locator_pin_dia": 1.85,
+    "outer_m3_ear_x": 51.5
   },
   "files": {
+    "horace_cam_back_mount_v2.stl": {
+      "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_back_mount_v2.stl",
+      "watertight": true,
+      "bounding_box_mm": [
+        112.2,
+        40.2,
+        18.8
+      ],
+      "volume_cm3": 28.54,
+      "triangles": 11274
+    },
     "horace_cam_back_mount.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_back_mount.stl",
       "watertight": true,
       "bounding_box_mm": [
-        101.0,
-        42.0,
-        17.8
+        112.2,
+        40.2,
+        18.8
       ],
-      "volume_cm3": 14.45,
-      "triangles": 6982
+      "volume_cm3": 28.54,
+      "triangles": 11274
     },
     "horace_cam_front_visor.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_front_visor.stl",
       "watertight": true,
       "bounding_box_mm": [
-        102.0,
-        26.0,
+        102.4,
+        27.4,
         14.5
       ],
-      "volume_cm3": 12.5,
-      "triangles": 4554
+      "volume_cm3": 14.05,
+      "triangles": 4532
     },
     "horace_cam_usb_shim.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_usb_shim.stl",
