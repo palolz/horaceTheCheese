@@ -20,10 +20,10 @@ The WAVE ROVER's black anodized metal expansion plate features a **90° upturned
 To protect the exposed ribbons, lock the camera rigidly against rover vibration, and keep the Mini-USB connector from wiggling loose, we designed a **three-part, 100% support-free 3D-printable enclosure** in [`cad/camera_mount/`](https://github.com/palolz/horaceTheCheese/tree/main/cad/camera_mount):
 
 <p>
-  <a class="htc-btn htc-btn--red" href="../assets/cad/horace_cam_back_mount.stl" download>⬇ Back Mount + Clamp (.stl)</a>
-  <a class="htc-btn" href="../assets/cad/horace_cam_front_visor.stl" download>⬇ Front Retro Visor (.stl)</a>
-  <a class="htc-btn htc-btn--yellow" href="../assets/cad/horace_cam_usb_shim.stl" download>⬇ Mini-USB Shim (.stl)</a>
-  <a class="htc-btn" href="../assets/cad/generate_camera_mount.py" download>⬇ Parametric Script (.py)</a>
+  <a class="htc-btn htc-btn--red" href="../../assets/cad/horace_cam_back_mount.stl" download>⬇ Back Mount + Clamp (.stl)</a>
+  <a class="htc-btn" href="../../assets/cad/horace_cam_front_visor.stl" download>⬇ Front Retro Visor (.stl)</a>
+  <a class="htc-btn htc-btn--yellow" href="../../assets/cad/horace_cam_usb_shim.stl" download>⬇ Mini-USB Shim (.stl)</a>
+  <a class="htc-btn" href="../../assets/cad/generate_camera_mount.py" download>⬇ Parametric Script (.py)</a>
 </p>
 
 | File | Dimensions (`X × Y × Z`) | Volume / Est. Mass | Role |
@@ -58,19 +58,19 @@ We cross-referenced the official Waveshare **`WAVE_ROVER-EP_DXF`** CAD drawing a
 
 <div class="htc-photo-grid">
   <figure class="htc-photo">
-    <img src="../assets/cad/P1044915.jpg" alt="WAVE ROVER metal expansion plate on the 5x5 mm grid mat">
+    <img src="../../assets/cad/P1044915.jpg" alt="WAVE ROVER metal expansion plate on the 5x5 mm grid mat">
     <figcaption><strong>Expansion plate (`P1044915`):</strong> Black anodized top deck on the 5×5 mm cutting mat with the 90° upturned camera bracket at the front.</figcaption>
   </figure>
   <figure class="htc-photo">
-    <img src="../assets/cad/P1044916.jpg" alt="Looking straight down the 90-degree upturned front bracket on the 5x5 mm grid">
+    <img src="../../assets/cad/P1044916.jpg" alt="Looking straight down the 90-degree upturned front bracket on the 5x5 mm grid">
     <figcaption><strong>90° upturned front tab (`P1044916`):</strong> The two mounting holes at the 25 mm and 45 mm grid lines (~20–21 mm spacing) and the two inner "half-square" notches flanking the center bridge.</figcaption>
   </figure>
   <figure class="htc-photo">
-    <img src="../assets/cad/P1044927.jpg" alt="Binocular stereo camera module flat on the 5x5 mm grid showing 95x20 mm PCB and 80 mm lens baseline">
+    <img src="../../assets/cad/P1044927.jpg" alt="Binocular stereo camera module flat on the 5x5 mm grid showing 95x20 mm PCB and 80 mm lens baseline">
     <figcaption><strong>Stereo camera front (`P1044927`):</strong> <code>95.0 × 20.0 mm</code> PCB, <code>80.0 mm</code> lens center-to-center baseline, exposed blue/white FFC ribbons, 12× M2 holes, and bottom-center Mini-USB port.</figcaption>
   </figure>
   <figure class="htc-photo">
-    <img src="../assets/cad/P1044928.jpg" alt="Top-edge profile of the stereo camera on the 5x5 mm grid showing 1.6 mm PCB and 19 mm lens barrel height">
+    <img src="../../assets/cad/P1044928.jpg" alt="Top-edge profile of the stereo camera on the 5x5 mm grid showing 1.6 mm PCB and 19 mm lens barrel height">
     <figcaption><strong>Top-edge profile (`P1044928`):</strong> <code>1.6 mm</code> PCB, <code>14 × 14 mm</code> M12 lens holders, <code>19.0 mm</code> total lens + cap height, and rear SMD clearance.</figcaption>
   </figure>
 </div>
