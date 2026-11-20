@@ -489,9 +489,9 @@ def render_back_mount_v2_sheets() -> tuple[Path, Path, Path]:
     add_mesh_to_ax(ax1, back_stl, "#2B5FAB")
     style_3d_ax(
         ax1,
-        "1 · Front / Inside View (Heat-Set Insert Bosses & Locating Pins)",
-        "4× Outer M3 (Ø4.0mm) + 4× PCB M2 (Ø3.2mm) + 4× Ø1.85mm Pins + Gusset Ribs",
-        xlim=(-52, 52),
+        "1 · Front / Inside View (101.2mm Pocket · 96mm Board · 113mm Casing)",
+        "4× Outer M3 (X=±56.5, Ø4.0mm) + 4× Board M2 (X=±48.0, Ø3.2mm) + 4× Ø1.85mm Pins (X=±26.1)",
+        xlim=(-58, 58),
         ylim=(-26, 18),
         zlim=(0, 22),
         elev=46,
@@ -509,7 +509,7 @@ def render_back_mount_v2_sheets() -> tuple[Path, Path, Path]:
         ax2,
         "2 · Rear Face (100% Flat Z=0 Build Plate — Zero Hex Nut Recesses!)",
         "Sealed 6.8mm backplate · Only 2× M3 (Ø4.0mm) + 2× M2 (Ø3.2mm) + 2× Ø2.8mm bracket bores",
-        xlim=(-52, 52),
+        xlim=(-58, 58),
         ylim=(-22, 22),
         zlim=(0, 22),
         elev=48,
@@ -522,8 +522,8 @@ def render_back_mount_v2_sheets() -> tuple[Path, Path, Path]:
     style_3d_ax(
         ax3,
         "3 · Structural Gusset Wings & M3 Heat-Set Mini-USB Clamp",
-        "Sweeping triangular gussets + raised ribs + M3 insert jaw (Ø4.0mm) vs Ø3.4mm bolt jaw",
-        xlim=(-46, 46),
+        "Sweeping 96mm triangular gussets + raised ribs + M3 insert jaw (Ø4.0mm) vs Ø3.4mm bolt jaw",
+        xlim=(-50, 50),
         ylim=(-27, 12),
         zlim=(0, 20),
         elev=28,
@@ -532,7 +532,7 @@ def render_back_mount_v2_sheets() -> tuple[Path, Path, Path]:
 
     # Panel 4: Flat FDM Print Bed Orientation (Z = 0.0 on Build Plate)
     ax4 = fig.add_subplot(2, 2, 4, projection="3d")
-    gx = np.linspace(-60, 60, 13)
+    gx = np.linspace(-65, 65, 14)
     gy = np.linspace(-30, 30, 7)
     for x in gx:
         ax4.plot([x, x], [gy[0], gy[-1]], [0, 0], color="#211D15", alpha=0.16, linewidth=0.8)
@@ -545,8 +545,8 @@ def render_back_mount_v2_sheets() -> tuple[Path, Path, Path]:
     style_3d_ax(
         ax4,
         "4 · Print Orientation: Flat on Z=0.0 (Zero Supports, Zero Bridges)",
-        "112.2 × 40.2 × 18.8 mm · 28.54 cm³ (~34g PLA/PETG) · 45° conical roofs on rear bores",
-        xlim=(-56, 56),
+        "122.2 × 40.2 × 18.8 mm · 31.05 cm³ (~37g PLA/PETG) · 45° conical roofs on rear bores",
+        xlim=(-62, 62),
         ylim=(-28, 28),
         zlim=(0, 22),
         elev=36,
@@ -595,42 +595,42 @@ def render_back_mount_v2_sheets() -> tuple[Path, Path, Path]:
     # --- Panel A: Front View (All Front Heat-Set Insert Bores, Locating Pins & Gussets) ---
     ax = axes[0, 0]
     ax.set_facecolor("#EFE5D2")
-    ax.set_xlim(-64, 64)
-    ax.set_ylim(-33, 24)
+    ax.set_xlim(-69, 69)
+    ax.set_ylim(-33, 25)
     ax.set_aspect("equal")
     ax.grid(True, which="both", color="#211D15", alpha=0.12, linestyle="--")
-    ax.set_title("A · Front View — M3/M2 Heat-Set Insert Bores & Gusset Ribs", fontsize=11.5, fontweight="bold", color="#211D15", pad=8)
+    ax.set_title("A · Front View — 101.2mm Pocket, 96mm Board Holes & 113mm Casing Ears", fontsize=11.2, fontweight="bold", color="#211D15", pad=8)
 
     # Gusset polygon outline
-    gusset_xy = [(-44.0, -11.5), (44.0, -11.5), (27.0, -18.5), (17.0, -25.5), (-17.0, -25.5), (-27.0, -18.5)]
+    gusset_xy = [(-48.0, -11.5), (48.0, -11.5), (29.0, -18.5), (17.0, -25.5), (-17.0, -25.5), (-29.0, -18.5)]
     ax.add_patch(Polygon(gusset_xy, closed=True, facecolor="#2B5FAB", edgecolor="#211D15", lw=1.8, alpha=0.65))
     # Pinch jaws (30 x 8.4 mm)
     ax.add_patch(FancyBboxPatch((-15.0, -23.85), 30.0, 8.4, boxstyle="round,pad=0,rounding_size=2.0", facecolor="#2B5FAB", edgecolor="#211D15", lw=1.8, alpha=0.85))
-    # Upper body (111.0 x 27.4 mm) + 4 corner Ø9.2 mm bosses (total width 112.2 mm)
-    ax.add_patch(FancyBboxPatch((-55.5, -13.7), 111.0, 27.4, boxstyle="round,pad=0,rounding_size=4.8", facecolor="#2B5FAB", edgecolor="#211D15", lw=2.0, alpha=0.88))
+    # Upper body (121.0 x 27.4 mm) + 4 corner Ø9.2 mm bosses (total width 122.2 mm)
+    ax.add_patch(FancyBboxPatch((-60.5, -13.7), 121.0, 27.4, boxstyle="round,pad=0,rounding_size=4.8", facecolor="#2B5FAB", edgecolor="#211D15", lw=2.0, alpha=0.88))
     # Diagonal stiffening ribs
-    ax.add_patch(Polygon([(-13.5, -24.5), (-9.5, -24.5), (-33.0, -11.5), (-39.5, -11.5)], closed=True, facecolor="#F2B417", edgecolor="#211D15", lw=1.3))
-    ax.add_patch(Polygon([(9.5, -24.5), (13.5, -24.5), (39.5, -11.5), (33.0, -11.5)], closed=True, facecolor="#F2B417", edgecolor="#211D15", lw=1.3))
-    # PCB cavity (96.0 x 21.0 mm)
-    ax.add_patch(Rectangle((-48.0, -10.5), 96.0, 21.0, facecolor="#EFE5D2", edgecolor="#211D15", lw=1.6))
-    # SMD pocket (91.0 x 16.6 mm)
-    ax.add_patch(Rectangle((-45.5, -8.3), 91.0, 16.6, facecolor="#DFD3BC", edgecolor="#211D15", lw=1.0, ls="--"))
+    ax.add_patch(Polygon([(-13.5, -24.5), (-9.5, -24.5), (-36.0, -11.5), (-43.0, -11.5)], closed=True, facecolor="#F2B417", edgecolor="#211D15", lw=1.3))
+    ax.add_patch(Polygon([(9.5, -24.5), (13.5, -24.5), (43.0, -11.5), (36.0, -11.5)], closed=True, facecolor="#F2B417", edgecolor="#211D15", lw=1.3))
+    # PCB cavity (101.2 x 21.0 mm for 100.0 x 20.0 mm board)
+    ax.add_patch(Rectangle((-50.6, -10.5), 101.2, 21.0, facecolor="#EFE5D2", edgecolor="#211D15", lw=1.6))
+    # SMD pocket (96.0 x 16.6 mm)
+    ax.add_patch(Rectangle((-48.0, -8.3), 96.0, 16.6, facecolor="#DFD3BC", edgecolor="#211D15", lw=1.0, ls="--"))
     # Center stiffening bridge (26 x 21 mm)
     ax.add_patch(Rectangle((-13.0, -10.5), 26.0, 21.0, facecolor="#EFE5D2", edgecolor="#211D15", lw=1.0))
 
-    # 4x Outer Corner M3 Heat-Set Insert Bosses (X = +-51.5, Y = +-8.5, Ø9.2mm boss, Ø4.0mm bore)
-    for ex in (-51.5, +51.5):
+    # 4x Outer Corner M3 Heat-Set Insert Bosses (X = +-56.5, Y = +-8.5, Ø9.2mm boss, Ø4.0mm bore — outside pocket!)
+    for ex in (-56.5, +56.5):
         for ey in (-8.5, +8.5):
             ax.add_patch(Circle((ex, ey), 4.6, facecolor="#E4402A", edgecolor="#211D15", lw=1.4))
             ax.add_patch(Circle((ex, ey), 2.0, facecolor="#F6EFE2", edgecolor="#211D15", lw=1.2))
 
-    # 4x PCB Corner M2 Heat-Set Insert Bosses (X = +-46.0, Y = +-8.5, Ø6.4mm boss, Ø3.2mm bore)
-    for bx in (-46.0, +46.0):
+    # 4x PCB End M2 Heat-Set Insert Bosses (X = +-48.0, Y = +-8.5, Ø6.0mm boss, Ø3.2mm bore — 96.0mm C-to-C!)
+    for bx in (-48.0, +48.0):
         for by in (-8.5, +8.5):
-            ax.add_patch(Circle((bx, by), 3.2, facecolor="#F2B417", edgecolor="#211D15", lw=1.2))
+            ax.add_patch(Circle((bx, by), 3.0, facecolor="#F2B417", edgecolor="#211D15", lw=1.2))
             ax.add_patch(Circle((bx, by), 1.6, facecolor="#F6EFE2", edgecolor="#211D15", lw=1.0))
 
-    # 4x Press-Fit Locating Pins (X = +-26.1, Y = +-8.5, Ø1.85mm pin on Ø5.2mm pad)
+    # 4x Press-Fit Locating Pins (X = +-26.1, Y = +-8.5, Ø1.85mm pin on Ø5.2mm pad — UNCHANGED!)
     for px in (-26.1, +26.1):
         for py in (-8.5, +8.5):
             ax.add_patch(Circle((px, py), 2.6, facecolor="#2B5FAB", edgecolor="#211D15", lw=1.0))
@@ -641,15 +641,16 @@ def render_back_mount_v2_sheets() -> tuple[Path, Path, Path]:
         for sy in (-8.5, +8.5):
             ax.add_patch(Circle((sx, sy), 2.6, facecolor="#9BA5B4", edgecolor="#211D15", lw=0.9))
 
-    dim_arrow(ax, -51.5, 16.0, +51.5, 16.0, "103.0 mm · 4× M3 Inserts (Ø4.0×6.5mm Bore, Ø9.2mm Boss)", (0, 3.2), "#E4402A", fontsize=8.2)
-    dim_arrow(ax, -46.0, -15.5, +46.0, -15.5, "92.0 mm · 4× PCB M2 Inserts (Ø3.2×4.5mm Bore)", (0, -3.0), "#211D15", fontsize=8.0)
-    dim_arrow(ax, -26.1, 1.5, +26.1, 1.5, "52.2 mm · 4× Ø1.85mm PCB Locating Pins", (0, 2.6), "#2B5FAB", fontsize=8.0)
+    dim_arrow(ax, -56.5, 16.5, +56.5, 16.5, "113.0 mm · 4× Casing M3 Inserts (X=±56.5, Ø4.0mm Bore)", (0, 3.2), "#E4402A", fontsize=8.0)
+    dim_arrow(ax, -50.6, 11.2, +50.6, 11.2, "101.2 mm PCB Pocket (100.0mm Board + 0.6mm/side)", (0, 2.2), "#211D15", fontsize=7.7)
+    dim_arrow(ax, -48.0, -15.5, +48.0, -15.5, "96.0 mm · 4× Board M2 Inserts (X=±48.0, Ø3.2×4.5mm)", (0, -3.0), "#211D15", fontsize=8.0)
+    dim_arrow(ax, -26.1, 1.2, +26.1, 1.2, "52.2 mm · 4× Ø1.85mm PCB Locating Pins (Unchanged)", (0, 2.5), "#2B5FAB", fontsize=7.8)
     dim_arrow(ax, -15.0, -28.0, +15.0, -28.0, "30.0 mm USB Pinch Jaws (Right: Ø4.0mm M3 Insert)", (0, -2.8), "#E4402A", fontsize=8.0)
 
     # --- Panel B: Rear Flat Bed Face (Z=0.0) & 90° Metal Bracket Fastening ---
     ax = axes[0, 1]
     ax.set_facecolor("#EFE5D2")
-    ax.set_xlim(-58, 58)
+    ax.set_xlim(-64, 64)
     ax.set_ylim(-31, 20)
     ax.set_aspect("equal")
     ax.grid(True, which="both", color="#211D15", alpha=0.12, linestyle="--")
@@ -657,7 +658,7 @@ def render_back_mount_v2_sheets() -> tuple[Path, Path, Path]:
 
     # Flat rear outline of v2 back cover
     ax.add_patch(Polygon(gusset_xy, closed=True, facecolor="#2B5FAB", edgecolor="#211D15", lw=1.8, alpha=0.45))
-    ax.add_patch(FancyBboxPatch((-55.5, -13.7), 111.0, 27.4, boxstyle="round,pad=0,rounding_size=4.8", facecolor="#2B5FAB", edgecolor="#211D15", lw=2.0, alpha=0.45))
+    ax.add_patch(FancyBboxPatch((-60.5, -13.7), 121.0, 27.4, boxstyle="round,pad=0,rounding_size=4.8", facecolor="#2B5FAB", edgecolor="#211D15", lw=2.0, alpha=0.45))
 
     # Overlay WAVE ROVER 90° metal tab (-22.44..+22.44 mm, y = -24.13..-4.50 mm)
     ax.add_patch(Rectangle((-22.44, -24.13), 44.88, 19.63, facecolor="#2C3036", edgecolor="#211D15", lw=2.0, alpha=0.75))
@@ -677,7 +678,7 @@ def render_back_mount_v2_sheets() -> tuple[Path, Path, Path]:
     ax.text(0.0, 5.5, "100% FLAT & SEALED REAR FACE (Z = 0.0 mm)\nZero Hex-Nut Recesses · Prints Flat on Bed Without Bridges!", ha="center", va="center", fontsize=8.8, fontweight="bold", family="monospace", color="#211D15", bbox=dict(boxstyle="round,pad=0.3", facecolor="#F2B417", edgecolor="#211D15", lw=1.4))
     dim_arrow(ax, -10.25, -2.5, +10.25, -2.5, "20.5 mm · 2× M2 Insert Bores (Ø3.2×4.5mm, Tab Holes)", (0, 2.5), "#2B5FAB", fontsize=8.0)
     dim_arrow(ax, -10.00, -20.5, +10.00, -20.5, "20.0 mm · 2× M3 Insert Bores (Ø4.0×6.5mm in U-Window!)", (0, -3.2), "#E4402A", fontsize=8.1)
-    dim_arrow(ax, -44.0, -27.2, +44.0, -27.2, "88.0 mm Structural Gusset Span (Zero Neck Weak Point)", (0, -2.5), "#211D15", fontsize=8.0)
+    dim_arrow(ax, -48.0, -27.2, +48.0, -27.2, "96.0 mm Structural Gusset Span (Zero Neck Weak Point)", (0, -2.5), "#211D15", fontsize=8.0)
 
     # --- Panel C: Heat-Set Insert Bore Cross-Sections & Why M5 Is Too Large ---
     ax = axes[1, 0]
@@ -686,11 +687,11 @@ def render_back_mount_v2_sheets() -> tuple[Path, Path, Path]:
     ax.set_ylim(0, 62)
     ax.set_aspect("equal")
     ax.axis("off")
-    ax.set_title("C · Heat-Set Insert Bore Specs (M3 vs M2 vs Why M5 Is Too Large)", fontsize=11.5, fontweight="bold", color="#211D15", pad=8)
+    ax.set_title("C · Updated Board & Casing Hole Coordinates (M3 vs M2 Specs)", fontsize=11.5, fontweight="bold", color="#211D15", pad=8)
 
     # Box 1: M3 Heat-Set Insert Spec (USED IN 7 PLACES)
     ax.add_patch(FancyBboxPatch((2, 32), 46, 27, boxstyle="round,pad=0,rounding_size=2.0", facecolor="#F6EFE2", edgecolor="#E4402A", lw=2.0))
-    ax.text(25, 55.5, "[RECOMMENDED] M3 HEAT-SET INSERT (7×)", ha="center", va="center", fontsize=8.2, fontweight="bold", color="#E4402A", family="monospace")
+    ax.text(25, 55.5, "[CASING & BRACKET] M3 INSERTS (7×)", ha="center", va="center", fontsize=8.2, fontweight="bold", color="#E4402A", family="monospace")
     ax.text(
         4.0,
         43.5,
@@ -698,50 +699,49 @@ def render_back_mount_v2_sheets() -> tuple[Path, Path, Path]:
         "  (Voron/Ruthex/CNC Kitchen OD 4.5–5.0mm)\n"
         "• Melt Bore: Ø 4.0 mm × 6.5 mm deep\n"
         "• Lead-In:   Ø 4.8 mm × 0.6 mm (45°)\n"
-        "• Boss OD:   Ø 9.2 mm (2.6 mm wall)\n"
-        "• Used at:   4× Outer Cover (X=±51.5),\n"
-        "  2× U-Window (X=±10.0), 1× USB Clamp Jaw",
+        "• Boss OD:   Ø 9.2 mm (inner edge X=±51.9)\n"
+        "• 4× Casing Ears: X = ±56.5 (113.0mm C-C)\n"
+        "• 2× U-Window (X=±10.0), 1× USB Clamp Jaw",
         ha="left",
         va="center",
-        fontsize=6.8,
+        fontsize=6.7,
         color="#211D15",
         family="monospace",
     )
 
-    # Box 2: M2 Heat-Set Insert Spec (OPTIONAL — 6×)
+    # Box 2: M2 Heat-Set Insert Spec (BOARD MOUNTING — 6×)
     ax.add_patch(FancyBboxPatch((52, 32), 46, 27, boxstyle="round,pad=0,rounding_size=2.0", facecolor="#F6EFE2", edgecolor="#2B5FAB", lw=2.0))
-    ax.text(75, 55.5, "[OPTIONAL] M2 HEAT-SET INSERT (6×)", ha="center", va="center", fontsize=8.2, fontweight="bold", color="#2B5FAB", family="monospace")
+    ax.text(75, 55.5, "[BOARD & TAB] M2 INSERTS (6×) + PINS", ha="center", va="center", fontsize=8.2, fontweight="bold", color="#2B5FAB", family="monospace")
     ax.text(
         54.0,
         43.5,
-        "• Insert: M2 × 3mm or M2 × 4mm brass\n"
-        "  (Standard OD 3.2–3.5 mm)\n"
-        "• Melt Bore: Ø 3.2 mm × 4.5 mm deep\n"
-        "• Lead-In:   Ø 3.8 mm × 0.5 mm (45°)\n"
-        "• Used at:   2× Tab Top Bar (X=±10.25)\n"
-        "  & 4× PCB Corners (X=±46.0, Y=±8.5).\n"
-        "• Note: 4× Ø1.85mm pins lock the PCB!",
+        "• Board Pocket: 101.2 × 21.0 mm\n"
+        "  (Fits 100.0×20.0mm PCB + 0.6mm/side)\n"
+        "• 4× Board End Holes: X = ±48.0, Y = ±8.5\n"
+        "  (96.0 mm C-C, Ø 3.2×4.5mm M2 insert)\n"
+        "• 4× Inner Locating Pins: X = ±26.1, Y = ±8.5\n"
+        "  (52.2 mm C-C, Ø 1.85 mm — unchanged!)\n"
+        "• 2× Tab Top Bar: X = ±10.25 (Ø 3.2mm M2)",
         ha="left",
         va="center",
-        fontsize=6.8,
+        fontsize=6.7,
         color="#211D15",
         family="monospace",
     )
 
-    # Box 3: Why M5 Is Too Big
+    # Box 3: Clearance Verification Between Board Pocket (X=±50.6) & Outer Casing Bosses (X=±56.5)
     ax.add_patch(FancyBboxPatch((2, 2), 96, 27, boxstyle="round,pad=0,rounding_size=2.0", facecolor="#F6EFE2", edgecolor="#211D15", lw=2.0))
-    ax.text(50, 25.5, "[TOO LARGE] WHY M5 THREADED INSERTS DO NOT FIT THIS CAMERA OR BRACKET", ha="center", va="center", fontsize=8.4, fontweight="bold", color="#211D15", family="monospace")
+    ax.text(50, 25.5, "[ZERO ENCROACHMENT] BOARD END HOLES (96mm) vs CASING EARS (113mm)", ha="center", va="center", fontsize=8.3, fontweight="bold", color="#211D15", family="monospace")
     ax.text(
         4.0,
         13.0,
-        "1. Stereo Camera PCB (95×20 mm): Has 12× Ø 2.0 mm holes just 1.5 mm from the PCB edge.\n"
-        "   An M5 screw (Ø 5.0 mm) or M5 insert (Ø 6.4 mm bore / Ø 8.0 mm OD / Ø 12 mm boss) is\n"
-        "   3×–4× wider than the PCB holes and collides with the 14×14 mm M12 lens holders!\n"
-        "2. WAVE ROVER 90° Metal Bracket: Top bar is 4.22 mm tall with 2× Ø 2.3 mm holes — an M5\n"
-        "   screw (5.0 mm) is wider than the metal bar! Use M3 heat-set inserts (Ø 4.0 mm bore).",
+        "1. 100.0 mm PCB sits inside the 101.2 mm pocket (X = -50.6 to +50.6 mm, 0.6 mm/side clearance).\n"
+        "2. 4× PCB End Mounting Holes sit at X = ±48.0 mm (96.0 mm C-to-C) on the Z = 6.8 mm PCB shelf.\n"
+        "3. 4× Outer M3 Casing Fastening Bosses (Ø 9.2 mm OD, Ø 4.0 mm bore) are pushed out to X = ±56.5 mm\n"
+        "   (113.0 mm C-to-C) — inner boss edge is at X = ±51.9 mm, 1.3 mm outside the 101.2 mm board pocket!",
         ha="left",
         va="center",
-        fontsize=6.9,
+        fontsize=6.8,
         color="#211D15",
         family="monospace",
     )

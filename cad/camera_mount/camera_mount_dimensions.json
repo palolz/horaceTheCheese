@@ -1,8 +1,9 @@
 {
   "parameters_mm": {
-    "pcb_width": 95.0,
+    "pcb_width": 100.0,
     "pcb_height": 20.0,
     "pcb_thickness": 1.6,
+    "pcb_clearance_x": 0.6,
     "pcb_clearance": 0.5,
     "lens_baseline": 80.0,
     "lens_base_size": 14.0,
@@ -10,7 +11,7 @@
     "lens_cap_dia": 15.0,
     "lens_visor_bore_dia": 16.6,
     "lens_total_protrusion": 19.0,
-    "hole_outer_x": 46.0,
+    "hole_outer_x": 48.0,
     "hole_inner_outer_x": 26.1,
     "hole_inner_inner_x": 22.1,
     "hole_y": 8.5,
@@ -44,41 +45,41 @@
     "m2_insert_bore_dia": 3.2,
     "m2_insert_depth": 4.5,
     "pcb_locator_pin_dia": 1.85,
-    "outer_m3_ear_x": 51.5
+    "outer_m3_ear_x": 56.5
   },
   "files": {
     "horace_cam_back_mount_v2.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_back_mount_v2.stl",
       "watertight": true,
       "bounding_box_mm": [
-        112.2,
+        122.2,
         40.2,
         18.8
       ],
-      "volume_cm3": 28.54,
-      "triangles": 11274
+      "volume_cm3": 31.05,
+      "triangles": 11262
     },
     "horace_cam_back_mount.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_back_mount.stl",
       "watertight": true,
       "bounding_box_mm": [
-        112.2,
+        122.2,
         40.2,
         18.8
       ],
-      "volume_cm3": 28.54,
-      "triangles": 11274
+      "volume_cm3": 31.05,
+      "triangles": 11262
     },
     "horace_cam_front_visor.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_front_visor.stl",
       "watertight": true,
       "bounding_box_mm": [
-        102.4,
+        107.4,
         27.4,
         14.5
       ],
-      "volume_cm3": 14.05,
-      "triangles": 4532
+      "volume_cm3": 15.22,
+      "triangles": 4652
     },
     "horace_cam_usb_shim.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_usb_shim.stl",
