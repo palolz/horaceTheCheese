@@ -27,18 +27,19 @@ Redesigned specifically for **M3 (and optional M2) brass heat-set threaded inser
 
 | File | Bounding Box (`X × Y × Z`) | Volume | Description |
 | --- | --- | --- | --- |
-| `horace_cam_back_mount_v2.stl` / `horace_cam_back_mount.stl` | `122.2 × 41.4 × 18.8 mm` | `32.49 cm³` | **v2 Rear structural shell** for `100.0 × 22.0 mm` board (`101.2 × 23.2 mm` pocket), `96.0 × 18.0 mm` C-to-C M2 board end holes (`X = ±48.0, Y = ±9.0 mm`), `113.0 × 18.0 mm` C-to-C outer M3 casing ears (`X = ±56.5, Y = ±9.0 mm`), 4× `Ø 1.85 mm` inner PCB locating pins (`X = ±26.1, Y = ±9.0 mm`), `96 mm` triangular gusset wings, and M3 Mini-USB pinch clamp. |
-| `horace_cam_front_visor.stl` | `107.4 × 29.6 × 14.5 mm` | `16.38 cm³` | Retro binocular front cover protecting the exposed FFC ribbon cables, with `Ø 16.6 mm` lens openings (`80.0 mm` baseline) and sculpted top sun-visor brow. |
+| `horace_cam_back_mount_v2.stl` / `horace_cam_back_mount.stl` | `122.2 × 42.4 × 18.8 mm` | `32.82 cm³` | **v2.2 Rear structural shell** for `100.0 × 22.0 mm` board (`101.2 × 23.2 mm` pocket, `98.0 × 18.0 mm` SMD recess clearing `85.0 mm` baseline sensors), `96.0 × 18.0 mm` C-to-C M2 board end holes (`X = ±48.0, Y = ±9.0 mm`), `113.0 × 18.0 mm` C-to-C outer M3 casing ears (`X = ±56.5, Y = ±9.0 mm`), 4× `Ø 1.85 mm` inner PCB locating pins (`X = ±26.1, Y = ±9.0 mm`), `96 mm` triangular gusset wings, and M3 Mini-USB pinch clamp. |
+| `horace_cam_front_visor_v2.stl` / `horace_cam_front_visor.stl` | `122.2 × 29.6 × 14.5 mm` | `26.24 cm³` | **v2.2 Retro binocular front cover** matching the `122.2 × 29.6 mm` upper back cover: **`85.0 mm` lens baseline (`X = ±42.5 mm, Y = 0.0 mm` = `11.0 mm` from `22.0 mm` edges)**, `Ø 16.6 mm` lens openings (`Ø 18.2 mm` chamfered bezel), `15.2 × 15.2 mm` internal M12 lens-base pockets with 45° conical roofs, 4× outer M3 counterbored holes (`X = ±56.5, Y = ±9.0 mm`), 4× M2 board corner counterbored holes (`X = ±48.0, Y = ±9.0 mm`), 4× locating-pin clearance dimples (`X = ±26.1, Y = ±9.0 mm`), and 45°-vaulted FFC ribbon chamber & Mini-USB arch. |
 | `horace_cam_usb_shim.stl` | `13.7 × 8.7 × 14.0 mm` | `0.67 cm³` | Parametric snap-in U-collar insert sized for a `10.2 × 7.0 mm` Mini-USB plug overmold and `Ø 4.5 mm` cable neck (`2-minute` reprint if your cable plug differs). |
 
-## Extracted Dimensions (Factory DXF + 5×5 mm Grid Photos)
+## Extracted & Verified Dimensions (v2.2)
 
-- **Stereo Camera PCB (`P1044926`–`P1044928`):**
-  - Outer PCB dimensions: **`95.0 × 20.0 × 1.6 mm`** (enclosure pocket: `96.0 × 21.0 mm`).
-  - **Lens center-to-center baseline:** **`80.0 mm`** (`X = -40.0 mm` and `+40.0 mm`).
-  - M12 lens holders & barrels: `14.0 × 14.0 mm` square base (`6.0 mm` tall), `Ø 14.0 mm` barrel (`Ø 15.0 mm` lens cap), **`19.0 mm`** total height above PCB front face (`Ø 16.6 mm` openings in front visor).
-  - Outer corner M2 holes (4×): **`92.0 × 17.0 mm`** (`X = ±46.0 mm, Y = ±8.5 mm`, `Ø 2.0 mm`).
-  - Inner FFC-flanking M2 holes (8×): `X = ±26.1 mm` (`52.2 mm`) and `X = ±22.1 mm` (`44.2 mm`), `Y = ±8.5 mm`.
+- **Stereo Camera PCB (`100.0 × 22.0 × 1.6 mm`):**
+  - Outer PCB dimensions: **`100.0 × 22.0 × 1.6 mm`** (enclosure pocket: **`101.2 × 23.2 mm`**, `0.6 mm` clearance per side in X and Y).
+  - **Lens center-to-center baseline:** **`85.0 mm`** (`X = -42.5 mm` and `+42.5 mm`, `Y = 0.0 mm` = `11.0 mm` from top/bottom edges and `7.5 mm` from left/right ends).
+  - M12 lens holders & barrels: `14.0 × 14.0 mm` square base (`6.0 mm` tall, `X = ±35.5..±49.5 mm, Y = ±7.0 mm`), `Ø 14.0 mm` barrel (`Ø 15.0 mm` lens cap), **`19.0 mm`** total height above PCB front face (`Ø 16.6 mm` openings in front visor + `15.2 × 15.2 mm` rear base pockets).
+  - Outer corner M2 holes (4×): **`96.0 × 18.0 mm`** (`X = ±48.0 mm, Y = ±9.0 mm`, `2.0 mm` inset from all four board edges).
+  - Inner FFC-flanking M2 locating holes (4× pins + 4× pads): `X = ±26.1 mm` (`52.2 × 18.0 mm` press-fit `Ø 1.85 mm` locating pins) and `X = ±22.1 mm` (`44.2 × 18.0 mm`), `Y = ±9.0 mm`.
+  - Outer M3 casing fastening ears (4×): **`113.0 × 18.0 mm`** (`X = ±56.5 mm, Y = ±9.0 mm`, `Ø 9.2 mm` boss OD, `Ø 4.0 × 6.5 mm` M3 insert bore on Back Cover, `Ø 3.4 mm` through + `Ø 6.5 mm` counterbore on Front Visor).
   - Mini-USB 5-pin receptacle: Centered horizontally at **`X = 0.0 mm`** on the bottom edge (`6.8 × 7.2 × 3.9 mm`).
 - **WAVE ROVER Expansion Plate 90° Upturned Front Bracket (`WAVE ROVER-EP DXF.dxf` + `P1044916`):**
   - Sheet metal thickness: **`2.00 mm`**.

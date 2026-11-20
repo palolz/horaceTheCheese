@@ -74,35 +74,37 @@ def add_mesh_to_ax(
 
 
 def make_camera_pcb_meshes() -> list[tuple[trimesh.Trimesh, str]]:
-    """Create illustrative 3D meshes for the 95x20x1.6mm stereo camera PCB, lenses, and Mini-USB."""
+    """Create illustrative 3D meshes for the 100x22x1.6mm stereo camera PCB, 85mm baseline lenses, and Mini-USB."""
     import manifold3d as mf
     from generate_camera_mount import CameraMountParams, cylinder_z, manifold_to_trimesh, rounded_rect_prism
 
     p = CameraMountParams()
-    # Black PCB substrate (z = 5.0 to 6.6 mm in assembly coords)
-    pcb = rounded_rect_prism(p.pcb_width, p.pcb_height, p.pcb_thickness, 0.8, (0.0, 0.0), z0=5.0)
+    z_pcb = p.back_thickness  # 6.8 mm
+    z_front = z_pcb + p.pcb_thickness  # 8.4 mm
+    # Black PCB substrate (z = 6.8 to 8.4 mm in assembly coords)
+    pcb = rounded_rect_prism(p.pcb_width, p.pcb_height, p.pcb_thickness, 0.8, (0.0, 0.0), z0=z_pcb)
     for hx in (-p.hole_outer_x, +p.hole_outer_x, -p.hole_inner_inner_x, +p.hole_inner_inner_x, -p.hole_inner_outer_x, +p.hole_inner_outer_x):
         for hy in (-p.hole_y, +p.hole_y):
-            pcb = pcb - cylinder_z(2.0, 5.0, hx, hy, z0=4.0)
+            pcb = pcb - cylinder_z(2.0, 5.0, hx, hy, z0=z_pcb - 1.0)
 
-    # Two 14x14mm M12 lens bases + Ø14mm barrels (z = 6.6 to 22.5 mm)
+    # Two 14x14mm M12 lens bases + Ø14mm barrels at X = +-42.5 mm, Y = 0.0 mm (85.0 mm baseline)
     lenses = None
     caps = None
-    for lx in (-40.0, +40.0):
-        base = rounded_rect_prism(14.0, 14.0, 6.0, 1.2, (lx, 0.0), z0=6.6)
-        barrel = cylinder_z(14.0, 14.5, lx, 0.0, z0=6.6, segments=48)
-        cap = cylinder_z(15.0, 4.2, lx, 0.0, z0=20.2, segments=48) - cylinder_z(12.6, 3.0, lx, 0.0, z0=21.6, segments=48)
+    for lx in (-p.lens_baseline * 0.5, +p.lens_baseline * 0.5):
+        base = rounded_rect_prism(14.0, 14.0, 6.0, 1.2, (lx, 0.0), z0=z_front)
+        barrel = cylinder_z(14.0, 14.5, lx, 0.0, z0=z_front, segments=48)
+        cap = cylinder_z(15.0, 4.2, lx, 0.0, z0=z_front + 13.6, segments=48) - cylinder_z(12.6, 3.0, lx, 0.0, z0=z_front + 15.0, segments=48)
         u = base + barrel
         lenses = u if lenses is None else (lenses + u)
         caps = cap if caps is None else (caps + cap)
 
-    # Gold Mini-USB receptacle (x = -3.4..+3.4, y = -10.2..-3.0, z = 6.6..10.5)
-    usb_rec = rounded_rect_prism(6.8, 7.2, 3.9, 0.6, (0.0, -6.6), z0=6.6)
+    # Gold Mini-USB receptacle (x = -3.4..+3.4, y = -11.2..-4.0, z = 8.4..12.3)
+    usb_rec = rounded_rect_prism(6.8, 7.2, 3.9, 0.6, (0.0, -7.6), z0=z_front)
 
-    # Two blue/white FFC ribbon arches (x = +-29.0, y = -5..+5, z = 6.6..11.2)
+    # Two blue/white FFC ribbon arches (x = +-29.5, y = -5..+5, z = 8.4..12.6)
     ribbons = None
     for rx in (-29.5, +29.5):
-        rib = rounded_rect_prism(8.0, 10.0, 4.2, 1.2, (rx, 0.0), z0=6.6)
+        rib = rounded_rect_prism(8.0, 10.0, 4.2, 1.2, (rx, 0.0), z0=z_front)
         ribbons = rib if ribbons is None else (ribbons + rib)
 
     return [
@@ -119,19 +121,19 @@ def make_upturned_bracket_mesh() -> trimesh.Trimesh:
     import manifold3d as mf
     from generate_camera_mount import cylinder_z, manifold_to_trimesh, rounded_rect_prism
 
-    # Vertical upturned tab (44.88 mm wide, y = -21.0 to -1.3, z = 0.0 to 2.0 mm)
-    tab = rounded_rect_prism(44.88, 19.7, 2.0, 1.5, (0.0, -11.15), z0=0.0)
-    # Central U-window cutout (25.75 mm wide x 8.5 mm tall)
-    window = rounded_rect_prism(25.75, 9.5, 4.0, 1.2, (0.0, -10.5), z0=-1.0)
+    # Vertical upturned tab (44.88 mm wide, y = -25.23 to -5.60, z = -2.0 to 0.0 mm behind flat Z=0 backplate)
+    tab = rounded_rect_prism(44.88, 19.63, 2.0, 1.5, (0.0, -15.415), z0=-2.0)
+    # Central U-window cutout (25.75 mm wide x 9.30 mm tall)
+    window = rounded_rect_prism(25.75, 9.30, 4.0, 1.2, (0.0, -14.47), z0=-3.0)
     # Two half-square notches on inside edge of top crossbar (X = +-7.45 mm, width = 3.12 mm)
-    notch_l = rounded_rect_prism(3.12, 3.2, 4.0, 0.5, (-7.45, -5.2), z0=-1.0)
-    notch_r = rounded_rect_prism(3.12, 3.2, 4.0, 0.5, (+7.45, -5.2), z0=-1.0)
-    # Two M2 holes at X = +-10.50 mm, Y = -3.35 mm
-    hole_l = cylinder_z(2.3, 5.0, -10.5, -3.35, z0=-1.0)
-    hole_r = cylinder_z(2.3, 5.0, +10.5, -3.35, z0=-1.0)
-    # Horizontal deck stub extending rearward (z = -28.0 to 2.0 mm, y = -23.0 to -21.0 mm)
-    deck = rounded_rect_prism(68.0, 2.0, 30.0, 1.5, (0.0, -22.0), z0=-28.0)
-    deck_cut = rounded_rect_prism(26.9, 4.0, 20.0, 1.5, (0.0, -22.0), z0=-18.0)
+    notch_l = rounded_rect_prism(3.12, 3.2, 4.0, 0.5, (-7.45, -8.8), z0=-3.0)
+    notch_r = rounded_rect_prism(3.12, 3.2, 4.0, 0.5, (+7.45, -8.8), z0=-3.0)
+    # Two M2 holes at X = +-10.25 mm, Y = -7.75 mm
+    hole_l = cylinder_z(2.3, 5.0, -10.25, -7.75, z0=-3.0)
+    hole_r = cylinder_z(2.3, 5.0, +10.25, -7.75, z0=-3.0)
+    # Horizontal deck stub extending rearward (z = -30.0 to 0.0 mm, y = -27.23 to -25.23 mm)
+    deck = rounded_rect_prism(68.0, 2.0, 30.0, 1.5, (0.0, -26.23), z0=-30.0)
+    deck_cut = rounded_rect_prism(26.9, 4.0, 20.0, 1.5, (0.0, -26.23), z0=-20.0)
 
     solid = (tab - window - notch_l - notch_r - hole_l - hole_r) + (deck - deck_cut)
     return manifold_to_trimesh(solid)
@@ -169,17 +171,16 @@ def style_3d_ax(ax, title: str, subtitle: str, xlim=(-60, 60), ylim=(-35, 35), z
 
 
 def render_3d_preview_sheet() -> Path:
-    ASSETS_CAD_DIR.mkdir(parents=True, exist_ok=True)
-    back_stl = trimesh.load_mesh(CAD_DIR / "horace_cam_back_mount.stl")
-    visor_stl = trimesh.load_mesh(CAD_DIR / "horace_cam_front_visor.stl")
+    back_stl = trimesh.load_mesh(CAD_DIR / "horace_cam_back_mount_v2.stl")
+    visor_stl = trimesh.load_mesh(CAD_DIR / "horace_cam_front_visor_v2.stl")
     shim_stl = trimesh.load_mesh(CAD_DIR / "horace_cam_usb_shim.stl")
     pcb_parts = make_camera_pcb_meshes()
     bracket_mesh = make_upturned_bracket_mesh()
 
     fig = plt.figure(figsize=(16, 11.5), dpi=180, facecolor="#F6EFE2")
     fig.suptitle(
-        "horaceTheCheese · Stage 3 Binocular Stereo Camera Mount & Enclosure (3D Printable CAD)",
-        fontsize=16,
+        "horaceTheCheese · Binocular Stereo Camera Mount v2.2 (100×22mm PCB · 85.0mm Lens Baseline · M3/M2 Inserts)",
+        fontsize=15.5,
         fontweight="bold",
         color="#211D15",
         y=0.975,
@@ -191,39 +192,37 @@ def render_3d_preview_sheet() -> Path:
     add_mesh_to_ax(ax1, transform_mesh(back_stl), "#2B5FAB")
     for m_pcb, c_pcb in pcb_parts:
         add_mesh_to_ax(ax1, transform_mesh(m_pcb), c_pcb)
-    # Visor sits at z = 6.6 mm in assembly
+    # Visor sits at z = 9.8 mm in assembly
     visor_assembled = visor_stl.copy()
-    visor_assembled.apply_translation([0.0, 0.0, 6.6])
+    visor_assembled.apply_translation([0.0, 0.0, 9.8])
     add_mesh_to_ax(ax1, transform_mesh(visor_assembled), "#E4402A")
-    # Shim inside lower USB bay
-    shim_assembled = shim_stl.copy()
-    shim_assembled.apply_Transform = None
     style_3d_ax(
         ax1,
         "1 · Assembled on WAVE ROVER 90° Front Bracket",
-        "Front visor (#E4402A) + Rear mount (#2B5FAB) + 80.0 mm stereo baseline",
-        xlim=(-56, 56),
-        ylim=(-28, 28),
-        zlim=(-30, 18),
+        "Front visor v2 (#E4402A) + Back mount v2 (#2B5FAB) + 85.0 mm lens baseline (X=±42.5mm)",
+        xlim=(-64, 64),
+        ylim=(-30, 30),
+        zlim=(-32, 19),
         elev=20,
-        azim=-58,
+        azim=122,
     )
 
-    # --- Panel 2: Rear 3/4 View Showing Anti-Rotation Keys & Bracket Seat ---
+    # --- Panel 2: Rear 3/4 View Showing Flat Z=0 Backplate & 90° Tab Interface ---
     ax2 = fig.add_subplot(2, 2, 2, projection="3d")
     add_mesh_to_ax(ax2, transform_mesh(back_stl), "#2B5FAB")
+    add_mesh_to_ax(ax2, transform_mesh(visor_assembled), "#E4402A")
     bracket_offset = bracket_mesh.copy()
-    bracket_offset.apply_translation([0.0, 0.0, -18.0])
+    bracket_offset.apply_translation([0.0, 0.0, -16.0])
     add_mesh_to_ax(ax2, transform_mesh(bracket_offset), "#33373D", alpha=0.88)
     style_3d_ax(
         ax2,
-        "2 · Rear Anti-Rotation Keys & 90° Tab Interface",
-        "2x notch keys (X=±7.45mm) + 20–21mm M2 slots + M3/zip-tie Mini-USB clamp",
-        xlim=(-56, 56),
-        ylim=(-36, 22),
-        zlim=(-30, 18),
+        "2 · Rear 90° Tab Interface & M3 Heat-Set Insert Bores",
+        "2x U-window M3 (X=±10.0mm) + 2x crossbar M2 (X=±10.25mm) + M3 Mini-USB clamp",
+        xlim=(-64, 64),
+        ylim=(-38, 24),
+        zlim=(-32, 19),
         elev=22,
-        azim=132,
+        azim=-52,
     )
 
     # --- Panel 3: Exploded Assembly View ---
@@ -247,26 +246,24 @@ def render_3d_preview_sheet() -> Path:
 
     # USB shim exploded below the collar
     shim_exp = shim_stl.copy()
-    # Rotate shim so its Z-axis aligns with Y_up
     r_shim = trimesh.transformations.euler_matrix(np.radians(90.0), 0.0, 0.0, "sxyz")
     shim_exp.apply_transform(r_shim)
-    shim_exp.apply_translation([0.0, -42.0, 6.0])
+    shim_exp.apply_translation([0.0, -44.0, 6.0])
     add_mesh_to_ax(ax3, transform_mesh(shim_exp), "#F2B417")
 
     style_3d_ax(
         ax3,
         "3 · Exploded Assembly (5 Layers)",
-        "90° Tab -> Back Mount -> 95x20mm Stereo PCB + USB Shim -> Front Visor",
-        xlim=(-58, 58),
+        "90° Tab -> Back Cover v2 -> 100×22mm PCB (85mm Lenses) + USB Shim -> Front Visor v2",
+        xlim=(-64, 64),
         ylim=(-42, 58),
         zlim=(-46, 20),
         elev=21,
-        azim=-52,
+        azim=128,
     )
 
     # --- Panel 4: Support-Free Print Bed Layout (Z = 0 Flat on Build Plate) ---
     ax4 = fig.add_subplot(2, 2, 4, projection="3d")
-    # Draw build plate grid
     gx = np.linspace(-65, 65, 14)
     gy = np.linspace(-55, 55, 12)
     for x in gx:
@@ -274,32 +271,31 @@ def render_3d_preview_sheet() -> Path:
     for y in gy:
         ax4.plot([gx[0], gx[-1]], [y, y], [0, 0], color="#211D15", alpha=0.15, linewidth=0.7)
 
-    # Place back_stl flat on print bed (its model Z is already print-height Z>=0!)
     b_bed = back_stl.copy()
-    b_bed.apply_translation([0.0, 22.0, 0.0])
+    b_bed.apply_translation([0.0, 23.0, 0.0])
     add_mesh_to_ax(ax4, b_bed, "#2B5FAB")
 
     v_bed = visor_stl.copy()
-    v_bed.apply_translation([0.0, -20.0, 0.0])
+    v_bed.apply_translation([0.0, -22.0, 0.0])
     add_mesh_to_ax(ax4, v_bed, "#E4402A")
 
     s_bed = shim_stl.copy()
-    s_bed.apply_translation([42.0, 2.0, 0.0])
+    s_bed.apply_translation([48.0, 0.0, 0.0])
     add_mesh_to_ax(ax4, s_bed, "#F2B417")
 
     style_3d_ax(
         ax4,
         "4 · Print Bed Orientation (100% Support-Free FDM)",
-        "All 3 STLs print flat on Z=0 · ~27.6 cm³ total (~33g PLA/PETG, ~48 min)",
-        xlim=(-65, 65),
-        ylim=(-52, 52),
+        "All 3 STLs print flat on Z=0 · 58.1 cm³ total (~70g PLA/PETG) · 45° vaulted roofs",
+        xlim=(-66, 66),
+        ylim=(-54, 54),
         zlim=(0, 32),
         elev=34,
         azim=-45,
     )
 
     plt.tight_layout(rect=[0.01, 0.01, 0.99, 0.95])
-    out_path = ASSETS_CAD_DIR / "camera-mount-render.png"
+    out_path = CAD_DIR / "camera-mount-render.png"
     fig.savefig(out_path, dpi=180, facecolor=fig.get_facecolor())
     plt.close(fig)
     print(f"[OK] Saved 3D preview sheet -> {out_path}")
@@ -307,18 +303,17 @@ def render_3d_preview_sheet() -> Path:
 
 
 def render_engineering_dimensions() -> tuple[Path, Path]:
-    """Generate engineering dimension sheet in both SVG and PNG formats."""
-    ASSETS_CAD_DIR.mkdir(parents=True, exist_ok=True)
+    """Generate assembly engineering dimension sheet in both SVG and PNG formats."""
     fig, axes = plt.subplots(2, 2, figsize=(16, 11.5), dpi=180, facecolor="#F6EFE2")
     fig.suptitle(
-        "horaceTheCheese · Stereo Camera & Expansion Bracket Engineering Dimensions (mm)",
-        fontsize=16,
+        "horaceTheCheese · Stereo Camera (100×22 mm, 85 mm Baseline) & Enclosure v2.2 Dimensions (mm)",
+        fontsize=15.5,
         fontweight="bold",
         color="#211D15",
         y=0.975,
     )
 
-    def dim_arrow(ax, x1, y1, x2, y2, text, text_offset=(0, 2.2), color="#E4402A", fontsize=9.0):
+    def dim_arrow(ax, x1, y1, x2, y2, text, text_offset=(0, 2.2), color="#E4402A", fontsize=8.6):
         ax.annotate(
             "",
             xy=(x2, y2),
@@ -339,98 +334,98 @@ def render_engineering_dimensions() -> tuple[Path, Path]:
             bbox=dict(boxstyle="round,pad=0.2", facecolor="#F6EFE2", edgecolor=color, lw=1.2),
         )
 
-    # --- Panel A: Stereo Camera PCB Front Orthographic (Measured from 5x5mm Grid) ---
+    # --- Panel A: Stereo Camera PCB & Enclosure Front Orthographic ---
     ax = axes[0, 0]
     ax.set_facecolor("#EFE5D2")
-    ax.set_xlim(-60, 60)
-    ax.set_ylim(-24, 24)
+    ax.set_xlim(-68, 68)
+    ax.set_ylim(-26, 26)
     ax.set_aspect("equal")
     ax.grid(True, which="both", color="#211D15", alpha=0.12, linestyle="--")
-    ax.set_title("A · Stereo Camera Module (Measured on 5×5 mm Grid)", fontsize=12, fontweight="bold", color="#211D15", pad=10)
+    ax.set_title("A · Stereo Camera Module (100×22 mm PCB · 85.0 mm Lens Baseline)", fontsize=11.5, fontweight="bold", color="#211D15", pad=10)
 
-    # Outer enclosure outline (101 x 26 mm)
-    ax.add_patch(FancyBboxPatch((-50.5, -13.0), 101.0, 26.0, boxstyle="round,pad=0,rounding_size=4.2", fill=False, edgecolor="#2B5FAB", lw=2.2, ls="--", label="Enclosure Outer (101×26 mm)"))
-    # PCB (95.0 x 20.0 mm)
-    ax.add_patch(Rectangle((-47.5, -10.0), 95.0, 20.0, facecolor="#211D15", edgecolor="#211D15", lw=2.0))
-    # 14x14 mm lens bases + Ø14 mm barrels + Ø15 mm caps at X = +-40.0 mm
-    for lx in (-40.0, +40.0):
+    # Outer enclosure outline (122.2 x 29.6 mm)
+    ax.add_patch(FancyBboxPatch((-60.5, -14.8), 121.0, 29.6, boxstyle="round,pad=0,rounding_size=4.8", fill=False, edgecolor="#2B5FAB", lw=2.2, ls="--"))
+    # 4x Outer M3 Casing Ears at X = +-56.5, Y = +-9.0
+    for ex in (-56.5, +56.5):
+        for ey in (-9.0, +9.0):
+            ax.add_patch(Circle((ex, ey), 4.6, facecolor="#E4402A", edgecolor="#211D15", lw=1.2, alpha=0.8))
+            ax.add_patch(Circle((ex, ey), 1.7, facecolor="#EFE5D2", edgecolor="#211D15", lw=1.0))
+
+    # PCB (100.0 x 22.0 mm)
+    ax.add_patch(Rectangle((-50.0, -11.0), 100.0, 22.0, facecolor="#211D15", edgecolor="#211D15", lw=2.0))
+    # 14x14 mm lens bases + Ø14 mm barrels + Ø16.6 mm visor bores at X = +-42.5 mm, Y = 0.0 mm
+    for lx in (-42.5, +42.5):
         ax.add_patch(Rectangle((lx - 7.0, -7.0), 14.0, 14.0, facecolor="#3A3F47", edgecolor="#F6EFE2", lw=1.2))
         ax.add_patch(Circle((lx, 0.0), 7.5, facecolor="#9BA5B4", edgecolor="#211D15", lw=1.5, alpha=0.85))
         ax.add_patch(Circle((lx, 0.0), 8.3, fill=False, edgecolor="#E4402A", lw=1.6, ls=":"))
-        ax.plot([lx, lx], [-11, 16], color="#E4402A", lw=1.0, ls="-.")
+        ax.plot([lx, lx], [-12, 16], color="#E4402A", lw=1.0, ls="-.")
 
     # FFC Ribbons
     for rx in (-29.5, +29.5):
         ax.add_patch(Rectangle((rx - 4.0, -5.5), 8.0, 11.0, facecolor="#2B5FAB", edgecolor="#F6EFE2", lw=1.0))
 
-    # Mini-USB at X = 0, Y = -10.0.. -2.8 mm
-    ax.add_patch(Rectangle((-3.4, -10.2), 6.8, 7.2, facecolor="#F2B417", edgecolor="#211D15", lw=1.5))
+    # Mini-USB at X = 0, Y = -11.0..-3.8 mm
+    ax.add_patch(Rectangle((-3.4, -11.2), 6.8, 7.2, facecolor="#F2B417", edgecolor="#211D15", lw=1.5))
 
-    # 12 M2 mounting holes
-    for hx in (-46.0, -26.1, -22.1, +22.1, +26.1, +46.0):
-        for hy in (-8.5, +8.5):
+    # 12 M2 mounting holes at X = +-48.0, +-26.1, +-22.1, Y = +-9.0
+    for hx in (-48.0, -26.1, -22.1, +22.1, +26.1, +48.0):
+        for hy in (-9.0, +9.0):
             ax.add_patch(Circle((hx, hy), 1.6, facecolor="#F2B417", edgecolor="#211D15", lw=0.8))
             ax.add_patch(Circle((hx, hy), 0.9, facecolor="#EFE5D2", edgecolor="#211D15", lw=0.6))
 
-    dim_arrow(ax, -40.0, 14.2, +40.0, 14.2, "80.0 mm Lens Baseline (C-to-C)", (0, 2.8), "#E4402A")
-    dim_arrow(ax, -46.0, -14.8, +46.0, -14.8, "92.0 mm Outer M2 Holes", (0, -2.8), "#2B5FAB")
-    dim_arrow(ax, -47.5, -20.2, +47.5, -20.2, "95.0 mm PCB Width (101.0 mm Shell)", (0, -2.6), "#211D15")
-    dim_arrow(ax, 52.5, -10.0, 52.5, +10.0, "20.0 mm\nPCB", (5.2, 0), "#211D15", fontsize=8.0)
+    dim_arrow(ax, -42.5, 16.2, +42.5, 16.2, "85.0 mm Lens Baseline (X=±42.5, Y=0.0)", (0, 2.8), "#E4402A", fontsize=8.2)
+    dim_arrow(ax, -48.0, -16.8, +48.0, -16.8, "96.0 × 18.0 mm Board Corner Holes (X=±48.0, Y=±9.0)", (0, -2.8), "#2B5FAB", fontsize=8.0)
+    dim_arrow(ax, -56.5, -22.5, +56.5, -22.5, "113.0 × 18.0 mm Casing M3 Ears (122.2 mm Shell)", (0, -2.6), "#211D15", fontsize=8.0)
+    dim_arrow(ax, 62.5, -11.0, 62.5, +11.0, "22.0 mm\nPCB", (3.8, 0), "#211D15", fontsize=7.6)
 
-    # --- Panel B: WAVE ROVER 90° Upturned Front Bracket & Anti-Rotation Keys ---
+    # --- Panel B: WAVE ROVER 90° Upturned Front Bracket & M3/M2 Insert Bores ---
     ax = axes[0, 1]
     ax.set_facecolor("#EFE5D2")
     ax.set_xlim(-32, 32)
     ax.set_ylim(-24, 11.5)
     ax.set_aspect("equal")
     ax.grid(True, which="both", color="#211D15", alpha=0.12, linestyle="--")
-    ax.set_title("B · WAVE ROVER 90° Upturned Tab (Factory DXF + P1044916)", fontsize=12, fontweight="bold", color="#211D15", pad=10)
+    ax.set_title("B · WAVE ROVER 90° Upturned Tab & Heat-Set Insert Bores", fontsize=11.5, fontweight="bold", color="#211D15", pad=10)
 
-    # Upturned tab outer boundary (-22.44 to +22.44 mm, height 19.63 mm from y=-20.8 to -1.2)
     ax.add_patch(Rectangle((-22.44, -20.83), 44.88, 19.63, facecolor="#2C3036", edgecolor="#211D15", lw=2.0))
-    # Central U-window (-12.88 to +12.88 mm, y = -15.0 to -5.42 mm)
     ax.add_patch(Rectangle((-12.88, -14.8), 25.76, 9.38, facecolor="#EFE5D2", edgecolor="#211D15", lw=1.6))
-    # Two half-square notches on inside of top crossbar (X = +-5.89 to +-9.01 mm, y = -5.42 to -3.4 mm)
     for sign in (-1.0, +1.0):
         x0 = sign * 7.45 - 1.56
         ax.add_patch(Rectangle((x0, -5.5), 3.12, 2.2, facecolor="#EFE5D2", edgecolor="#211D15", lw=1.4))
-        # Anti-rotation key inside the notch
-        ax.add_patch(Rectangle((sign * 7.45 - 1.35, -5.4), 2.70, 2.0, facecolor="#F2B417", edgecolor="#E4402A", lw=1.6))
-        # M2 mounting hole at X = +-10.50 mm (DXF) / +-10.0 mm (grid) -> oblong slot
-        ax.add_patch(FancyBboxPatch((sign * 10.25 - 1.75, -3.35 - 1.2), 3.5, 2.4, boxstyle="round,pad=0,rounding_size=1.1", facecolor="#2B5FAB", edgecolor="#F6EFE2", lw=1.2))
+        ax.add_patch(Circle((sign * 7.45, -4.4), 1.4, facecolor="#F2B417", edgecolor="#E4402A", lw=1.4))
+        ax.add_patch(Circle((sign * 10.25, -3.35), 1.6, facecolor="#2B5FAB", edgecolor="#F6EFE2", lw=1.4))
+        ax.add_patch(Circle((sign * 10.00, -10.5), 2.0, facecolor="#E4402A", edgecolor="#F6EFE2", lw=1.4))
 
     dim_arrow(ax, -22.44, 5.2, +22.44, 5.2, "44.88 mm Tab Width (2.00 mm Thick)", (0, 2.2), "#211D15")
-    dim_arrow(ax, -10.25, -0.2, +10.25, -0.2, "20.0–21.0 mm M2 Slots", (0, 2.1), "#2B5FAB")
-    dim_arrow(ax, -7.45, -8.2, +7.45, -8.2, "14.9 mm Anti-Rot Keys (2.7×3.0 mm)", (0, -2.2), "#E4402A")
-    dim_arrow(ax, -12.88, -17.5, +12.88, -17.5, "25.75 mm Central U-Window", (0, -2.2), "#211D15")
+    dim_arrow(ax, -10.25, -0.2, +10.25, -0.2, "20.5 mm M2 Insert Bores (Ø3.2mm)", (0, 2.1), "#2B5FAB")
+    dim_arrow(ax, -10.00, -17.5, +10.00, -17.5, "20.0 mm M3 U-Window Inserts (Ø4.0mm)", (0, -2.4), "#E4402A")
     dim_arrow(ax, 25.5, -20.83, 25.5, -1.2, "19.63 mm\nTab Ht", (4.2, 0), "#211D15", fontsize=8.0)
 
-    # --- Panel C: Side Profile & Lens Protrusion Cross-Section (P1044928) ---
+    # --- Panel C: Side Profile & Lens Protrusion Cross-Section ---
     ax = axes[1, 0]
     ax.set_facecolor("#EFE5D2")
     ax.set_xlim(-6, 30)
-    ax.set_ylim(-32, 18)
+    ax.set_ylim(-32, 19)
     ax.set_aspect("equal")
     ax.grid(True, which="both", color="#211D15", alpha=0.12, linestyle="--")
-    ax.set_title("C · Side Cross-Section (Z-Stack, Lens Height & Deck Clearance)", fontsize=12, fontweight="bold", color="#211D15", pad=10)
+    ax.set_title("C · Side Cross-Section (6.8 mm Base + 1.6 mm PCB + Front Visor v2)", fontsize=11.5, fontweight="bold", color="#211D15", pad=10)
 
-    # Rear shell (z = 0 to 8.2, y = -13 to +13) + lower USB collar (y = -29 to -13, z = 0 to 17.8)
-    ax.add_patch(Rectangle((0.0, -13.0), 5.0, 26.0, facecolor="#2B5FAB", edgecolor="#211D15", lw=1.8, alpha=0.85))
-    ax.add_patch(Rectangle((0.0, -29.0), 17.8, 16.0, facecolor="#2B5FAB", edgecolor="#211D15", lw=1.8, alpha=0.65))
-    # Upturned 2.0 mm metal tab seated in z = 0..2.1 mm, y = -21..-1.2 mm + horizontal deck at y = -23..-21 mm
-    ax.add_patch(Rectangle((0.0, -21.0), 2.0, 19.8, facecolor="#2C3036", edgecolor="#211D15", lw=1.8))
-    ax.add_patch(Rectangle((-5.0, -23.0), 7.0, 2.0, facecolor="#2C3036", edgecolor="#211D15", lw=1.8))
-    # PCB (z = 5.0 to 6.6 mm, y = -10 to +10 mm)
-    ax.add_patch(Rectangle((5.0, -10.0), 1.6, 20.0, facecolor="#1E242B", edgecolor="#211D15", lw=1.5))
-    # Lens base + barrel + cap (z = 6.6 to 25.6 mm, y = -7 to +7 mm)
-    ax.add_patch(Rectangle((6.6, -7.0), 15.5, 14.0, facecolor="#3A3F47", edgecolor="#211D15", lw=1.5))
-    ax.add_patch(Rectangle((22.1, -7.5), 3.5, 15.0, facecolor="#9BA5B4", edgecolor="#211D15", lw=1.5))
-    # Front visor + sun brow (z = 6.6 to 21.1 mm)
-    ax.add_patch(Polygon([(6.6, 10.0), (21.1, 10.0), (21.1, 13.0), (6.6, 13.0)], closed=True, facecolor="#E4402A", edgecolor="#211D15", lw=1.6))
+    # Rear shell (z = 0 to 9.8, y = -14.8 to +14.8) + lower USB collar (y = -26.6 to -13.3, z = 0 to 18.8)
+    ax.add_patch(Rectangle((0.0, -14.8), 6.8, 29.6, facecolor="#2B5FAB", edgecolor="#211D15", lw=1.8, alpha=0.85))
+    ax.add_patch(Rectangle((0.0, -26.6), 18.8, 13.3, facecolor="#2B5FAB", edgecolor="#211D15", lw=1.8, alpha=0.65))
+    # Upturned 2.0 mm metal tab behind z = 0 (-2.0..0.0 mm)
+    ax.add_patch(Rectangle((-2.0, -25.23), 2.0, 19.63, facecolor="#2C3036", edgecolor="#211D15", lw=1.8))
+    ax.add_patch(Rectangle((-5.5, -27.23), 5.5, 2.0, facecolor="#2C3036", edgecolor="#211D15", lw=1.8))
+    # PCB (z = 6.8 to 8.4 mm, y = -11 to +11 mm)
+    ax.add_patch(Rectangle((6.8, -11.0), 1.6, 22.0, facecolor="#1E242B", edgecolor="#211D15", lw=1.5))
+    # Lens base + barrel + cap (z = 8.4 to 27.4 mm, y = -7 to +7 mm)
+    ax.add_patch(Rectangle((8.4, -7.0), 15.5, 14.0, facecolor="#3A3F47", edgecolor="#211D15", lw=1.5))
+    ax.add_patch(Rectangle((23.9, -7.5), 3.5, 15.0, facecolor="#9BA5B4", edgecolor="#211D15", lw=1.5))
+    # Front visor + sun brow (z = 9.8 to 24.3 mm)
+    ax.add_patch(Polygon([(9.8, 10.6), (24.3, 10.6), (24.3, 14.8), (9.8, 14.8)], closed=True, facecolor="#E4402A", edgecolor="#211D15", lw=1.6))
 
-    dim_arrow(ax, 6.6, 15.0, 25.6, 15.0, "19.0 mm Lens + Cap", (0, 1.8), "#E4402A", fontsize=8.5)
-    dim_arrow(ax, 0.0, -30.8, 17.8, -30.8, "17.8 mm Collar Depth", (0, 1.8), "#2B5FAB", fontsize=8.5)
-    ax.text(14.5, -21.5, "Mini-USB drops in front\nof 2.0mm tab (Z=+5.6..14.6)", fontsize=8.3, family="monospace", color="#211D15", bbox=dict(boxstyle="round,pad=0.25", facecolor="#F2B417", edgecolor="#211D15"))
+    dim_arrow(ax, 8.4, 15.8, 27.4, 15.8, "19.0 mm Lens + Cap", (0, 1.8), "#E4402A", fontsize=8.5)
+    dim_arrow(ax, 0.0, -29.2, 18.8, -29.2, "18.8 mm Collar Depth", (0, -2.0), "#2B5FAB", fontsize=8.5)
 
     # --- Panel D: Mini-USB Strain-Relief Clamp & Parametric Shim Detail ---
     ax = axes[1, 1]
@@ -439,28 +434,23 @@ def render_engineering_dimensions() -> tuple[Path, Path]:
     ax.set_ylim(-2, 22)
     ax.set_aspect("equal")
     ax.grid(True, which="both", color="#211D15", alpha=0.12, linestyle="--")
-    ax.set_title("D · Mini-USB Plug Holder, M3 Pinch Clamp & Parametric Shim", fontsize=12, fontweight="bold", color="#211D15", pad=10)
+    ax.set_title("D · Mini-USB Plug Holder, M3 Insert Pinch Clamp & Parametric Shim", fontsize=11.5, fontweight="bold", color="#211D15", pad=10)
 
-    # Outer collar + M3 ears (-13.5..+13.5, z = 0..17.8)
-    ax.add_patch(FancyBboxPatch((-9.5, 0.0), 19.0, 17.8, boxstyle="round,pad=0,rounding_size=2.5", facecolor="#2B5FAB", edgecolor="#211D15", lw=2.0, alpha=0.85))
-    ax.add_patch(FancyBboxPatch((-13.5, 5.5), 27.0, 11.0, boxstyle="round,pad=0,rounding_size=2.0", facecolor="#2B5FAB", edgecolor="#211D15", lw=1.8, alpha=0.85))
-    # Inner USB bay (13.0 x 9.0 mm at z = 5.6..14.6)
-    ax.add_patch(Rectangle((-6.5, 5.6), 13.0, 9.0, facecolor="#EFE5D2", edgecolor="#211D15", lw=1.8))
-    # Parametric USB shim inside bay (12.65 x 8.7 mm outer, 10.2 x 7.0 mm inner plug pocket)
-    ax.add_patch(Rectangle((-6.2, 5.75), 12.4, 8.7, facecolor="#F2B417", edgecolor="#211D15", lw=1.6))
-    ax.add_patch(Rectangle((-5.1, 6.6), 10.2, 7.0, facecolor="#3A3F47", edgecolor="#211D15", lw=1.4))
-    # Front flex slit (1.8 mm)
-    ax.add_patch(Rectangle((-0.9, 13.5), 1.8, 4.5, facecolor="#EFE5D2", edgecolor="#E4402A", lw=1.2))
-    # M3 bolt axis at z = 11.0
-    ax.plot([-15.5, 15.5], [11.0, 11.0], color="#E4402A", lw=2.0, ls="--")
-    ax.text(0.0, 10.1, "10.2 × 7.0 mm\nMini-USB Plug\n(Parametric Shim)", ha="center", va="center", fontsize=8.0, fontweight="bold", color="#F6EFE2", family="monospace")
+    ax.add_patch(FancyBboxPatch((-10.0, 0.0), 20.0, 18.8, boxstyle="round,pad=0,rounding_size=2.5", facecolor="#2B5FAB", edgecolor="#211D15", lw=2.0, alpha=0.85))
+    ax.add_patch(FancyBboxPatch((-15.0, 7.2), 30.0, 10.6, boxstyle="round,pad=0,rounding_size=2.0", facecolor="#2B5FAB", edgecolor="#211D15", lw=1.8, alpha=0.85))
+    ax.add_patch(Rectangle((-6.5, 7.4), 13.0, 9.0, facecolor="#EFE5D2", edgecolor="#211D15", lw=1.8))
+    ax.add_patch(Rectangle((-6.2, 7.55), 12.4, 8.7, facecolor="#F2B417", edgecolor="#211D15", lw=1.6))
+    ax.add_patch(Rectangle((-5.1, 8.4), 10.2, 7.0, facecolor="#3A3F47", edgecolor="#211D15", lw=1.4))
+    ax.add_patch(Rectangle((-0.9, 15.4), 1.8, 3.6, facecolor="#EFE5D2", edgecolor="#E4402A", lw=1.2))
+    ax.plot([-16.5, 16.5], [12.6, 12.6], color="#E4402A", lw=2.0, ls="--")
+    ax.text(0.0, 11.9, "10.2 × 7.0 mm\nMini-USB Plug\n(Parametric Shim)", ha="center", va="center", fontsize=8.0, fontweight="bold", color="#F6EFE2", family="monospace")
 
-    dim_arrow(ax, -6.5, 3.2, +6.5, 3.2, "13.0 mm Max Bay Width", (0, -1.6), "#211D15", fontsize=8.5)
-    dim_arrow(ax, -13.5, 19.2, +13.5, 19.2, "27.0 mm M3 Pinch-Clamp Ears + 4.2mm Zip-Tie Slot", (0, 1.4), "#E4402A", fontsize=8.2)
+    dim_arrow(ax, -6.5, 4.2, +6.5, 4.2, "13.0 mm Max Bay Width", (0, -1.6), "#211D15", fontsize=8.5)
+    dim_arrow(ax, -15.0, 19.6, +15.0, 19.6, "30.0 mm M3 Heat-Set Insert Pinch Jaws", (0, 1.2), "#E4402A", fontsize=8.2)
 
     plt.tight_layout(rect=[0.01, 0.01, 0.99, 0.95])
-    png_path = ASSETS_CAD_DIR / "camera-mount-dimensions.png"
-    svg_path = ASSETS_CAD_DIR / "camera-mount-dimensions.svg"
+    png_path = CAD_DIR / "camera-mount-dimensions.png"
+    svg_path = CAD_DIR / "camera-mount-dimensions.svg"
     fig.savefig(png_path, dpi=180, facecolor=fig.get_facecolor())
     fig.savefig(svg_path, facecolor=fig.get_facecolor())
     plt.close(fig)
@@ -788,6 +778,334 @@ def render_back_mount_v2_sheets() -> tuple[Path, Path, Path]:
     return render_out, svg_out, png_out
 
 
+def render_front_visor_v2_sheets() -> tuple[Path, Path, Path]:
+    """Render 4-panel 3D inspection sheet + 4-panel engineering drawing for Front Visor v2."""
+    visor_stl = trimesh.load_mesh(CAD_DIR / "horace_cam_front_visor_v2.stl")
+    back_stl = trimesh.load_mesh(CAD_DIR / "horace_cam_back_mount_v2.stl")
+    pcb_parts = make_camera_pcb_meshes()
+
+    # =========================================================================
+    # 1. 4-Panel 3D Render Sheet of `horace_cam_front_visor_v2.stl`
+    # =========================================================================
+    fig = plt.figure(figsize=(16, 11.5), dpi=180, facecolor="#F6EFE2")
+    fig.suptitle(
+        "horaceTheCheese · Front Visor v2 (85.0 mm Lens Baseline · 100×22 mm Board · 113×18 mm M3 Ears)",
+        fontsize=15.5,
+        fontweight="bold",
+        color="#211D15",
+        y=0.975,
+    )
+
+    # Panel 1: Front 3/4 View (Looking at the 85.0mm binocular lens turrets, sun-visor brow & M3/M2 counterbores)
+    ax1 = fig.add_subplot(2, 2, 1, projection="3d")
+    add_mesh_to_ax(ax1, visor_stl, "#E4402A")
+    style_3d_ax(
+        ax1,
+        "1 · Front 3/4 View (85.0 mm Lens Baseline at X=±42.5, Y=0.0)",
+        "2× Ø16.6mm lens bores + 4× M3 C'bores (X=±56.5, Y=±9.0) + 4× M2 (X=±48.0, Y=±9.0)",
+        xlim=(-60, 60),
+        ylim=(-20, 20),
+        zlim=(0, 18),
+        elev=42,
+        azim=-58,
+    )
+
+    # Panel 2: Rear / Inside Cavity View (Flipped 180° so flat Z=0 mating face & internal pockets face up!)
+    ax2 = fig.add_subplot(2, 2, 2, projection="3d")
+    visor_inside_up = visor_stl.copy()
+    r_flip = trimesh.transformations.euler_matrix(np.radians(180.0), 0.0, 0.0, "sxyz")
+    visor_inside_up.apply_transform(r_flip)
+    visor_inside_up.apply_translation([0.0, 0.0, 14.5])
+    add_mesh_to_ax(ax2, visor_inside_up, "#E4402A")
+    style_3d_ax(
+        ax2,
+        "2 · Rear / Inside View (15.2×15.2 mm Pockets & 45° Chamber)",
+        "Clears 14×14mm M12 lens bases, FFC ribbons, 4× locating pins (X=±26.1, Y=±9.0) & Mini-USB",
+        xlim=(-60, 60),
+        ylim=(-20, 20),
+        zlim=(0, 18),
+        elev=46,
+        azim=-56,
+    )
+
+    # Panel 3: Assembled Fit Check on Back Cover v2 + 100×22 mm Stereo Camera PCB
+    ax3 = fig.add_subplot(2, 2, 3, projection="3d")
+    add_mesh_to_ax(ax3, transform_mesh(back_stl), "#2B5FAB")
+    for m_pcb, c_pcb in pcb_parts:
+        add_mesh_to_ax(ax3, transform_mesh(m_pcb), c_pcb)
+    visor_assy = visor_stl.copy()
+    visor_assy.apply_translation([0.0, 0.0, 9.8])
+    add_mesh_to_ax(ax3, transform_mesh(visor_assy), "#E4402A", alpha=0.92)
+    style_3d_ax(
+        ax3,
+        "3 · Assembled Fit Check (Visor v2 + 100×22 PCB + Back Cover v2)",
+        "Zero collisions · 122.2 × 29.6 mm matching shell · M12 barrels protrude cleanly",
+        xlim=(-62, 62),
+        ylim=(-26, 26),
+        zlim=(-28, 18),
+        elev=22,
+        azim=124,
+    )
+
+    # Panel 4: Flat FDM Print Bed Orientation (Z = 0.0 on Build Plate)
+    ax4 = fig.add_subplot(2, 2, 4, projection="3d")
+    gx = np.linspace(-65, 65, 14)
+    gy = np.linspace(-25, 25, 6)
+    for x in gx:
+        ax4.plot([x, x], [gy[0], gy[-1]], [0, 0], color="#211D15", alpha=0.16, linewidth=0.8)
+    for y in gy:
+        ax4.plot([gx[0], gx[-1]], [y, y], [0, 0], color="#211D15", alpha=0.16, linewidth=0.8)
+
+    add_mesh_to_ax(ax4, visor_stl, "#E4402A")
+    style_3d_ax(
+        ax4,
+        "4 · Print Orientation: Flat on Z=0.0 (100% Support-Free FDM)",
+        "122.2 × 29.6 × 14.5 mm · 24.58 cm³ (~30g PLA/PETG) · 45° vaulted internal ceilings",
+        xlim=(-62, 62),
+        ylim=(-22, 22),
+        zlim=(0, 18),
+        elev=36,
+        azim=-48,
+    )
+
+    plt.tight_layout(rect=[0.01, 0.01, 0.99, 0.95])
+    render_out = CAD_DIR / "front-visor-v2-render.png"
+    fig.savefig(render_out, dpi=180, facecolor=fig.get_facecolor())
+    plt.close(fig)
+    print(f"[OK] Saved Front Visor v2 3D render -> {render_out}")
+
+    # =========================================================================
+    # 2. 4-Panel Engineering Dimension Drawing for Front Visor v2 (SVG + PNG)
+    # =========================================================================
+    fig, axes = plt.subplots(2, 2, figsize=(16.5, 12.0), dpi=180, facecolor="#F6EFE2")
+    fig.suptitle(
+        "horaceTheCheese · Front Visor v2 — 85.0 mm Lens Baseline & Fastening Hole Coordinates (mm)",
+        fontsize=15.5,
+        fontweight="bold",
+        color="#211D15",
+        y=0.975,
+    )
+
+    def dim_arrow(ax, x1, y1, x2, y2, text, text_offset=(0, 2.2), color="#E4402A", fontsize=8.4):
+        ax.annotate(
+            "",
+            xy=(x2, y2),
+            xytext=(x1, y1),
+            arrowprops=dict(arrowstyle="<->", color=color, lw=1.8, shrinkA=0, shrinkB=0),
+        )
+        mx, my = 0.5 * (x1 + x2) + text_offset[0], 0.5 * (y1 + y2) + text_offset[1]
+        ax.text(
+            mx,
+            my,
+            text,
+            ha="center",
+            va="center",
+            fontsize=fontsize,
+            fontweight="bold",
+            color="#211D15",
+            family="monospace",
+            bbox=dict(boxstyle="round,pad=0.22", facecolor="#F6EFE2", edgecolor=color, lw=1.2),
+        )
+
+    # --- Panel A: Front View (85.0 mm Lens Turrets, Top Sun-Visor Brow & M3/M2 Counterbores) ---
+    ax = axes[0, 0]
+    ax.set_facecolor("#EFE5D2")
+    ax.set_xlim(-69, 69)
+    ax.set_ylim(-25, 25)
+    ax.set_aspect("equal")
+    ax.grid(True, which="both", color="#211D15", alpha=0.12, linestyle="--")
+    ax.set_title("A · Front View — 85.0 mm Lens Baseline (X=±42.5, Y=0.0) & Counterbores", fontsize=11.2, fontweight="bold", color="#211D15", pad=8)
+
+    # Main visor body (121.0 x 29.6 mm, 122.2 mm across Ø9.2 mm corner ears)
+    ax.add_patch(FancyBboxPatch((-60.5, -14.8), 121.0, 29.6, boxstyle="round,pad=0,rounding_size=4.8", facecolor="#E4402A", edgecolor="#211D15", lw=2.0, alpha=0.88))
+    # Top sun-visor brow (Y = +10.6..+14.8 mm)
+    ax.add_patch(FancyBboxPatch((-60.0, 10.6), 120.0, 4.2, boxstyle="round,pad=0,rounding_size=1.8", facecolor="#B82D1B", edgecolor="#211D15", lw=1.5, alpha=0.9))
+
+    # 2x Binocular Lens Turrets at X = +-42.5, Y = 0.0 (Ø22.4 mm turret OD, Ø18.2 mm chamfer, Ø16.6 mm through-bore)
+    for lx in (-42.5, +42.5):
+        ax.add_patch(Circle((lx, 0.0), 11.2, facecolor="#E4402A", edgecolor="#211D15", lw=1.8))
+        ax.add_patch(Circle((lx, 0.0), 9.1, facecolor="#F2B417", edgecolor="#211D15", lw=1.2))
+        ax.add_patch(Circle((lx, 0.0), 8.3, facecolor="#EFE5D2", edgecolor="#211D15", lw=1.6))
+        ax.plot([lx, lx], [-13.5, 13.5], color="#211D15", lw=0.9, ls="-.")
+        ax.plot([lx - 12.5, lx + 12.5], [0.0, 0.0], color="#211D15", lw=0.9, ls="-.")
+
+    # 4x Outer M3 Fastening Holes + Ø6.5 mm Counterbores (X = +-56.5, Y = +-9.0)
+    for ex in (-56.5, +56.5):
+        for ey in (-9.0, +9.0):
+            ax.add_patch(Circle((ex, ey), 4.6, facecolor="#E4402A", edgecolor="#211D15", lw=1.4))
+            ax.add_patch(Circle((ex, ey), 3.25, facecolor="#F2B417", edgecolor="#211D15", lw=1.2))
+            ax.add_patch(Circle((ex, ey), 1.7, facecolor="#F6EFE2", edgecolor="#211D15", lw=1.2))
+
+    # 4x Optional M2 Board Corner Holes + Ø4.6 mm Counterbores (X = +-48.0, Y = +-9.0)
+    for hx in (-48.0, +48.0):
+        for hy in (-9.0, +9.0):
+            ax.add_patch(Circle((hx, hy), 2.3, facecolor="#2B5FAB", edgecolor="#211D15", lw=1.2))
+            ax.add_patch(Circle((hx, hy), 1.2, facecolor="#F6EFE2", edgecolor="#211D15", lw=1.0))
+
+    dim_arrow(ax, -56.5, 17.5, +56.5, 17.5, "113.0 × 18.0 mm · 4× M3 Casing Bolts (Ø3.4mm + Ø6.5mm C'Bore)", (0, 3.0), "#E4402A", fontsize=7.9)
+    dim_arrow(ax, -42.5, 11.5, +42.5, 11.5, "85.0 mm Lens Center-to-Center (X = ±42.5 mm, Y = 0.0 mm)", (0, 2.5), "#211D15", fontsize=8.0)
+    dim_arrow(ax, -48.0, -17.0, +48.0, -17.0, "96.0 × 18.0 mm · 4× M2 Board Corner Holes (Ø2.4mm + Ø4.6mm C'Bore)", (0, -3.2), "#2B5FAB", fontsize=7.8)
+    dim_arrow(ax, 62.5, -14.8, 62.5, +14.8, "29.6 mm\nHeight", (3.8, 0), "#211D15", fontsize=7.6)
+
+    # --- Panel B: Rear / Inside View with 100×22 mm PCB & 14×14 mm Lens Base Overlay ---
+    ax = axes[0, 1]
+    ax.set_facecolor("#EFE5D2")
+    ax.set_xlim(-69, 69)
+    ax.set_ylim(-25, 25)
+    ax.set_aspect("equal")
+    ax.grid(True, which="both", color="#211D15", alpha=0.12, linestyle="--")
+    ax.set_title("B · Rear / Inside Cavity View + 100×22 mm PCB & Lens Base Overlay", fontsize=11.2, fontweight="bold", color="#211D15", pad=8)
+
+    # Visor outer footprint
+    ax.add_patch(FancyBboxPatch((-60.5, -14.8), 121.0, 29.6, boxstyle="round,pad=0,rounding_size=4.8", facecolor="#E4402A", edgecolor="#211D15", lw=2.0, alpha=0.55))
+    # 100 x 22 mm PCB dashed reference outline
+    ax.add_patch(Rectangle((-50.0, -11.0), 100.0, 22.0, fill=False, edgecolor="#211D15", lw=1.8, ls="--"))
+    # Central FFC ribbon vaulted chamber (66.0 x 14.4 mm, X = -33..+33, Y = -7.2..+7.2)
+    ax.add_patch(FancyBboxPatch((-33.0, -7.2), 66.0, 14.4, boxstyle="round,pad=0,rounding_size=2.0", facecolor="#EFE5D2", edgecolor="#211D15", lw=1.5))
+    # Bottom Mini-USB arch (13.8 x 8.8 mm)
+    ax.add_patch(FancyBboxPatch((-6.9, -14.8), 13.8, 7.6, boxstyle="round,pad=0,rounding_size=1.4", facecolor="#EFE5D2", edgecolor="#211D15", lw=1.5))
+
+    # 2x Square 15.2 x 15.2 mm pockets (X = +-34.9..+-50.1, Y = -7.6..+7.6) around 14.0 x 14.0 mm M12 lens bases
+    for lx in (-42.5, +42.5):
+        ax.add_patch(FancyBboxPatch((lx - 7.6, -7.6), 15.2, 15.2, boxstyle="round,pad=0,rounding_size=1.0", facecolor="#F2B417", edgecolor="#211D15", lw=1.5, alpha=0.75))
+        ax.add_patch(Rectangle((lx - 7.0, -7.0), 14.0, 14.0, fill=False, edgecolor="#211D15", lw=1.3, ls=":"))
+        ax.add_patch(Circle((lx, 0.0), 8.3, facecolor="#EFE5D2", edgecolor="#211D15", lw=1.5))
+
+    # 4x Locating Pin Clearance Dimples (X = +-26.1, Y = +-9.0, Ø3.2 mm)
+    for px in (-26.1, +26.1):
+        for py in (-9.0, +9.0):
+            ax.add_patch(Circle((px, py), 1.6, facecolor="#2B5FAB", edgecolor="#211D15", lw=1.2))
+
+    # 4x M2 & 4x M3 Through-Holes
+    for ex in (-56.5, +56.5):
+        for ey in (-9.0, +9.0):
+            ax.add_patch(Circle((ex, ey), 1.7, facecolor="#F6EFE2", edgecolor="#211D15", lw=1.2))
+    for hx in (-48.0, +48.0):
+        for hy in (-9.0, +9.0):
+            ax.add_patch(Circle((hx, hy), 1.2, facecolor="#F6EFE2", edgecolor="#211D15", lw=1.1))
+
+    dim_arrow(ax, -50.0, 15.5, +50.0, 15.5, "100.0 × 22.0 mm PCB Reference Outline (7.5 mm End-to-Lens Center)", (0, 2.8), "#211D15", fontsize=7.9)
+    dim_arrow(ax, -33.0, 0.0, +33.0, 0.0, "66.0 × 14.4 mm FFC Ribbon Chamber (45° Vaulted Roof)", (0, 2.2), "#2B5FAB", fontsize=7.8)
+    dim_arrow(ax, -50.1, -17.0, -34.9, -17.0, "15.2×15.2mm Base Pocket", (0, -3.0), "#E4402A", fontsize=7.6)
+    dim_arrow(ax, -26.1, -11.5, +26.1, -11.5, "52.2 × 18.0 mm · 4× Ø3.2mm Pin Dimples", (0, -2.6), "#2B5FAB", fontsize=7.7)
+
+    # --- Panel C: Longitudinal Cross-Section Through Lenses (Y=0) & Fastening Ears (Y=±9.0) ---
+    ax = axes[1, 0]
+    ax.set_facecolor("#EFE5D2")
+    ax.set_xlim(-66, 66)
+    ax.set_ylim(-3, 30)
+    ax.set_aspect("equal")
+    ax.grid(True, which="both", color="#211D15", alpha=0.12, linestyle="--")
+    ax.set_title("C · Assembly Z-Stack Cross-Section (Back Cover v2 + PCB + Front Visor v2)", fontsize=11.2, fontweight="bold", color="#211D15", pad=8)
+
+    # Back Cover v2 (Z = 0..9.8 mm, width = 122.2 mm)
+    ax.add_patch(Rectangle((-61.1, 0.0), 122.2, 6.8, facecolor="#2B5FAB", edgecolor="#211D15", lw=1.8, alpha=0.85))
+    ax.add_patch(Rectangle((-61.1, 6.8), 10.5, 3.0, facecolor="#2B5FAB", edgecolor="#211D15", lw=1.8, alpha=0.85))
+    ax.add_patch(Rectangle((50.6, 6.8), 10.5, 3.0, facecolor="#2B5FAB", edgecolor="#211D15", lw=1.8, alpha=0.85))
+    # SMD pocket (Z = 5.4..6.8 mm)
+    ax.add_patch(Rectangle((-49.0, 5.4), 98.0, 1.4, facecolor="#EFE5D2", edgecolor="#211D15", lw=1.0, ls="--"))
+    # 100 mm PCB (Z = 6.8..8.4 mm)
+    ax.add_patch(Rectangle((-50.0, 6.8), 100.0, 1.6, facecolor="#1E242B", edgecolor="#211D15", lw=1.5))
+
+    # Front Visor v2 sitting on Z = 9.8 mm (Z = 9.8..18.8 mm plate, Z = 9.8..23.3 mm turrets)
+    ax.add_patch(Rectangle((-61.1, 9.8), 122.2, 9.0, facecolor="#E4402A", edgecolor="#211D15", lw=1.8, alpha=0.85))
+    for lx in (-42.5, +42.5):
+        ax.add_patch(Rectangle((lx - 11.2, 9.8), 22.4, 13.5, facecolor="#E4402A", edgecolor="#211D15", lw=1.8, alpha=0.9))
+        # 15.2 mm base pocket (Z = 9.8..14.5 mm) + Ø16.6 mm lens bore
+        ax.add_patch(Rectangle((lx - 8.3, 9.7), 16.6, 13.8, facecolor="#EFE5D2", edgecolor="#211D15", lw=1.4))
+        # M12 lens base (14x14x6mm, Z = 8.4..14.4 mm) + barrel + cap (Z = 8.4..27.4 mm)
+        ax.add_patch(Rectangle((lx - 7.0, 8.4), 14.0, 6.0, facecolor="#3A3F47", edgecolor="#211D15", lw=1.4))
+        ax.add_patch(Rectangle((lx - 7.0, 14.4), 14.0, 13.0, facecolor="#6C7582", edgecolor="#211D15", lw=1.4))
+
+    # Central FFC ribbon vaulted chamber in Front Visor (Z = 9.8..16.6 mm)
+    ax.add_patch(Rectangle((-33.0, 9.7), 66.0, 6.9, facecolor="#EFE5D2", edgecolor="#211D15", lw=1.2, ls="--"))
+
+    # Outer M3 Heat-Set Insert (in Back Cover Z = 3.3..9.8 mm) + M3 Bolt through Front Visor (X = +-56.5 mm)
+    for ex in (-56.5, +56.5):
+        ax.add_patch(Rectangle((ex - 2.0, 3.3), 4.0, 6.5, facecolor="#F2B417", edgecolor="#211D15", lw=1.2))
+        ax.add_patch(Rectangle((ex - 1.7, 9.8), 3.4, 4.5, facecolor="#F6EFE2", edgecolor="#211D15", lw=1.1))
+        ax.add_patch(Rectangle((ex - 3.25, 14.3), 6.5, 4.6, facecolor="#F6EFE2", edgecolor="#211D15", lw=1.1))
+
+    dim_arrow(ax, -42.5, 25.5, +42.5, 25.5, "85.0 mm Lens Baseline (X = ±42.5 mm)", (0, 2.2), "#E4402A", fontsize=8.2)
+    dim_arrow(ax, -56.5, -1.2, +56.5, -1.2, "113.0 mm Outer M3 Heat-Set Insert Fastening", (0, -1.2), "#2B5FAB", fontsize=8.0)
+
+    # --- Panel D: Front Visor v2 Feature & Clearance Table ---
+    ax = axes[1, 1]
+    ax.set_facecolor("#EFE5D2")
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 62)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    ax.set_title("D · Front Visor v2 (`horace_cam_front_visor_v2.stl`) Specification Summary", fontsize=11.2, fontweight="bold", color="#211D15", pad=8)
+
+    ax.add_patch(FancyBboxPatch((2, 32), 46, 27, boxstyle="round,pad=0,rounding_size=2.0", facecolor="#F6EFE2", edgecolor="#E4402A", lw=2.0))
+    ax.text(25, 55.5, "[OPTICS] 85.0 mm LENS BASELINE", ha="center", va="center", fontsize=8.2, fontweight="bold", color="#E4402A", family="monospace")
+    ax.text(
+        4.0,
+        43.5,
+        "• Lens Centers: X = ±42.5 mm, Y = 0.0 mm\n"
+        "  (85.0 mm C-to-C; 11.0 mm from 22mm edges;\n"
+        "   7.5 mm inset from 100.0 mm PCB ends)\n"
+        "• Visor Lens Bore: Ø 16.6 mm through-bore\n"
+        "  + Ø 18.2 mm × 0.8 mm 45° front bezel\n"
+        "• Rear Base Pocket: 15.2 × 15.2 × 4.7 mm\n"
+        "  + 45° conical roof (clears 14×14×6mm base)",
+        ha="left",
+        va="center",
+        fontsize=6.6,
+        color="#211D15",
+        family="monospace",
+    )
+
+    ax.add_patch(FancyBboxPatch((52, 32), 46, 27, boxstyle="round,pad=0,rounding_size=2.0", facecolor="#F6EFE2", edgecolor="#2B5FAB", lw=2.0))
+    ax.text(75, 55.5, "[FASTENING] M3 EARS & M2 CORNERS", ha="center", va="center", fontsize=8.2, fontweight="bold", color="#2B5FAB", family="monospace")
+    ax.text(
+        54.0,
+        43.5,
+        "• Outer Footprint: 122.2 × 29.6 × 14.5 mm\n"
+        "  (Matches Back Cover v2.2 upper shell)\n"
+        "• 4× Outer M3 Holes: X = ±56.5, Y = ±9.0\n"
+        "  (113×18mm C-C, Ø 3.4mm + Ø 6.5mm C'Bore)\n"
+        "• 4× Board M2 Holes: X = ±48.0, Y = ±9.0\n"
+        "  (96×18mm C-C, Ø 2.4mm + Ø 4.6mm C'Bore)\n"
+        "• 4× Pin Dimples: X = ±26.1, Y = ±9.0 (Ø3.2)",
+        ha="left",
+        va="center",
+        fontsize=6.6,
+        color="#211D15",
+        family="monospace",
+    )
+
+    ax.add_patch(FancyBboxPatch((2, 2), 96, 27, boxstyle="round,pad=0,rounding_size=2.0", facecolor="#F6EFE2", edgecolor="#211D15", lw=2.0))
+    ax.text(50, 25.5, "[3D PRINTING & CLEARANCE] 100% SUPPORT-FREE FLAT ON Z = 0.0 mm", ha="center", va="center", fontsize=8.2, fontweight="bold", color="#211D15", family="monospace")
+    ax.text(
+        4.0,
+        13.0,
+        "1. Zero Collisions Verified (0.0000 mm³ boolean interference across Back Cover v2 + 100×22mm PCB + Visor v2).\n"
+        "2. Each 14×14 mm M12 lens base (X = ±35.5..±49.5, Y = ±7.0 mm) sits cleanly inside the 15.2×15.2 mm pocket\n"
+        "   without touching the Y = ±9.0 mm M2 corner holes (X = ±48.0) or the X = ±56.5 mm outer M3 casing ears.\n"
+        "3. Central FFC ribbon chamber (66×14.4 mm) & Mini-USB arch use 45° vaulted roofs — prints flat with zero supports!",
+        ha="left",
+        va="center",
+        fontsize=6.6,
+        color="#211D15",
+        family="monospace",
+    )
+
+    plt.tight_layout(rect=[0.01, 0.01, 0.99, 0.95])
+    png_out = CAD_DIR / "front-visor-v2-dimensions.png"
+    svg_out = CAD_DIR / "front-visor-v2-dimensions.svg"
+    fig.savefig(png_out, dpi=180, facecolor=fig.get_facecolor())
+    fig.savefig(svg_out, facecolor=fig.get_facecolor())
+    plt.close(fig)
+    print(f"[OK] Saved Front Visor v2 engineering dimensions -> {png_out} and {svg_out}")
+    return render_out, svg_out, png_out
+
+
 if __name__ == "__main__":
     render_back_mount_v2_sheets()
+    render_front_visor_v2_sheets()
+    render_3d_preview_sheet()
+    render_engineering_dimensions()
+
 

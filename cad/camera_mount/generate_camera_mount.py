@@ -37,11 +37,11 @@ class CameraMountParams:
     pcb_clearance_x: float = 0.6       # mm per side X pocket clearance -> 101.2 mm cavity width
     pcb_clearance: float = 0.6         # mm per side Y pocket clearance -> 23.2 mm cavity height
 
-    lens_baseline: float = 80.0        # mm center-to-center (X = -40.0 and +40.0 mm)
+    lens_baseline: float = 85.0        # mm center-to-center (X = -42.5 and +42.5 mm, Y = 0.0 mm)
     lens_base_size: float = 14.0       # mm square M12 lens holder base on PCB
     lens_barrel_dia: float = 14.0      # mm cylindrical M12 barrel OD
     lens_cap_dia: float = 15.0         # mm translucent dust cap OD
-    lens_visor_bore_dia: float = 16.6  # mm visor opening (clears barrel + dust cap)
+    lens_visor_bore_dia: float = 16.6  # mm visor opening (clears Ø14mm barrel + Ø15mm cap)
     lens_total_protrusion: float = 19.0  # mm above PCB front face (with cap)
 
     # PCB M2 mounting hole locations relative to PCB center (0, 0)
@@ -337,10 +337,12 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
     )
     body = body - pcb_pocket
 
-    # 5. Cut out the rear SMD clearance pocket (96.0 x 18.0 mm, z = 5.4 to 6.8 mm -> leaves a 5.4 mm solid backplate!)
+    # 5. Cut out the rear SMD clearance pocket (98.0 x 18.0 mm, z = 5.4 to 6.8 mm -> leaves a 5.4 mm solid backplate!)
+    #    Spans X = -49.0..+49.0 mm so the rear of the 85.0 mm baseline lens sensors (X = +-42.5 mm, base +-35.5..+-49.5 mm)
+    #    has full SMD clearance while the 4 corner bosses at X = +-48.0, Y = +-9.0 mm are added back below.
     smd_floor_z = p.back_thickness - p.pcb_recess_depth  # 5.4 mm
     smd_pocket = rounded_rect_prism(
-        width=p.pcb_width - 4.0,
+        width=p.pcb_width - 2.0,
         height=p.pcb_height - 4.0,
         depth=p.pcb_recess_depth + 0.5,
         radius=1.5,
@@ -516,15 +518,23 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
 
 
 def build_front_visor(p: CameraMountParams) -> mf.Manifold:
-    """Build `horace_cam_front_visor.stl` (Print flat on Z=0 back face with zero supports)."""
-    cav_w = p.pcb_width + 2.0 * p.pcb_clearance   # 96.0 mm
-    cav_h = p.pcb_height + 2.0 * p.pcb_clearance  # 21.0 mm
-    outer_w = cav_w + 2.0 * p.wall_thickness      # 101.0 mm
-    outer_h = cav_h + 2.0 * p.wall_thickness      # 26.0 mm
+    """Build `horace_cam_front_visor_v2.stl` (Print flat on Z=0 back face with zero supports).
 
-    visor_plate_h = 8.5  # main visor body thickness (z = 0 to 8.5 mm)
+    Matches the 122.2 x 29.6 mm upper housing of `horace_cam_back_mount_v2.stl`:
+      - 85.0 mm lens center-to-center baseline (X = +-42.5 mm, Y = 0.0 mm = 11.0 mm from 22.0 mm board edges)
+      - 4x Outer M3 fastening through-holes + Ø6.5 mm counterbores at X = +-56.5 mm, Y = +-9.0 mm (113.0 x 18.0 mm)
+      - 4x Optional M2 board corner through-holes + Ø4.6 mm counterbores at X = +-48.0 mm, Y = +-9.0 mm (96.0 x 18.0 mm)
+      - 15.2 x 15.2 mm internal square pockets for the 14.0 x 14.0 mm M12 lens bases with 45-deg self-supporting roofs
+      - 45-deg vaulted central FFC ribbon chamber & Mini-USB arch for 100% support-free flat printing on Z = 0.0 mm
+    """
+    cav_w = p.pcb_width + 2.0 * p.pcb_clearance_x  # 101.2 mm
+    cav_h = p.pcb_height + 2.0 * p.pcb_clearance   # 23.2 mm
+    outer_w = 2.0 * p.outer_m3_ear_x + 8.0         # 121.0 mm (122.2 mm across Ø9.2 mm corner ears)
+    outer_h = cav_h + 2.0 * p.wall_thickness       # 29.6 mm (Y = -14.8..+14.8 mm)
 
-    # 1. Main visor body
+    visor_plate_h = 10.0  # main visor body thickness (z = 0.0 to 10.0 mm)
+
+    # 1. Main visor body + 4x Ø9.2 mm outer M3 corner ears (matching back cover upper shell)
     visor = rounded_rect_prism(
         width=outer_w,
         height=outer_h,
@@ -533,14 +543,25 @@ def build_front_visor(p: CameraMountParams) -> mf.Manifold:
         center_xy=(0.0, 0.0),
         z0=0.0,
     )
+    for ex in (-p.outer_m3_ear_x, +p.outer_m3_ear_x):
+        for ey in (-p.hole_y, +p.hole_y):
+            visor = visor + cylinder_z(dia=9.2, depth=visor_plate_h, cx=ex, cy=ey, z0=0.0)
 
-    # 2. Raised binocular lens turrets at X = -40.0 and +40.0 mm (z = 0 to 13.5 mm)
-    turret_od = p.lens_visor_bore_dia + 5.4  # 22.0 mm OD
-    turret_h = 13.5
+    # 2. Raised binocular lens turrets at X = -42.5 and +42.5 mm, Y = 0.0 mm (85.0 mm baseline, z = 0 to 13.2 mm)
+    #    Lower turret body (z = 0..10.0 mm, Ø22.4 mm) + tapered upper binocular bezel (z = 10.0..13.2 mm, Ø20.4 -> Ø19.4 mm)
+    turret_od = p.lens_visor_bore_dia + 5.8  # 22.4 mm OD
+    turret_h = 13.2
     for lx in (-p.lens_baseline * 0.5, +p.lens_baseline * 0.5):
-        visor = visor + cylinder_z(dia=turret_od, depth=turret_h, cx=lx, cy=0.0, z0=0.0, segments=64)
+        visor = visor + cylinder_z(dia=turret_od, depth=visor_plate_h, cx=lx, cy=0.0, z0=0.0, segments=64)
+        upper_bezel = mf.Manifold.cylinder(
+            turret_h - visor_plate_h + 0.2,
+            10.2,
+            9.7,
+            64,
+        ).translate([lx, 0.0, visor_plate_h - 0.2])
+        visor = visor + upper_bezel
 
-    # 3. Retro 70s sun-visor brow along the upper edge (y = +8.5 to +13.0 mm, z = 0 to 14.5 mm)
+    # 3. Retro 70s sun-visor brow along the upper edge (y = +10.6 to +14.8 mm, z = 0 to 14.5 mm)
     brow_depth = 14.5
     top_brow = rounded_rect_prism(
         width=outer_w,
@@ -550,7 +571,6 @@ def build_front_visor(p: CameraMountParams) -> mf.Manifold:
         center_xy=(0.0, outer_h * 0.5 - 2.1),
         z0=0.0,
     )
-    # Trim brow ends inside outer shell footprint
     outer_clip = rounded_rect_prism(
         width=outer_w,
         height=outer_h,
@@ -561,66 +581,100 @@ def build_front_visor(p: CameraMountParams) -> mf.Manifold:
     )
     visor = visor + (top_brow ^ outer_clip)
 
-    # 4. Cut out inner electronics & FFC ribbon protection chamber (z = 0 to 6.5 mm, x = -31.5 to +31.5 mm)
-    ribbon_chamber = rounded_rect_prism(
-        width=63.0,
-        height=cav_h - 1.0,
-        depth=6.5,
+    # 4. Cut out inner electronics & FFC ribbon protection chamber between the two lenses (X = -33.0..+33.0 mm)
+    #    Uses a 45-deg vaulted roof (z = 2.9 to 6.8 mm) so it prints flat on Z=0 with zero supports!
+    ribbon_base = rounded_rect_prism(
+        width=66.0,
+        height=14.4,
+        depth=3.0,
         radius=2.0,
         center_xy=(0.0, 0.0),
         z0=-0.1,
     )
-    # Shallow 2.0 mm recess across full PCB footprint (z = 0 to 2.0 mm) to clear 14x14 mm square lens bases
-    lens_base_recess = rounded_rect_prism(
-        width=cav_w - 0.4,
-        height=cav_h - 0.4,
-        depth=2.2,
-        radius=1.2,
+    ribbon_top = rounded_rect_prism(
+        width=60.0,
+        height=6.0,
+        depth=0.2,
+        radius=1.5,
         center_xy=(0.0, 0.0),
-        z0=-0.1,
+        z0=6.8,
     )
-    visor = visor - ribbon_chamber - lens_base_recess
+    ribbon_chamber = (ribbon_base + ribbon_top).hull()
+    visor = visor - ribbon_chamber
 
-    # 5. Cut out the two circular binocular lens bores (dia = 16.6 mm at X = -40.0 and +40.0 mm)
+    # 4b. 4x Clearance dimples (Ø3.2 x 1.6 mm conical) at X = +-26.1, Y = +-9.0 mm over the Back Cover locating pins
+    for px in (-p.hole_inner_outer_x, +p.hole_inner_outer_x):
+        for py in (-p.hole_y, +p.hole_y):
+            visor = visor - blind_insert_bore_from_bottom_z(
+                bore_dia=3.2,
+                depth=1.6,
+                cx=px,
+                cy=py,
+                z0=0.0,
+                chamfer_extra=0.4,
+                chamfer_depth=0.3,
+            )
+
+    # 5. Cut out the two circular binocular lens bores (Ø16.6 mm at X = +-42.5 mm, Y = 0.0 mm)
+    #    plus 45-deg front bezel chamfers (Ø18.2 mm) and 15.2 x 15.2 mm rear pockets for the 14x14 mm M12 lens bases!
     for lx in (-p.lens_baseline * 0.5, +p.lens_baseline * 0.5):
+        # Main Ø16.6 mm through-bore
         visor = visor - cylinder_z(dia=p.lens_visor_bore_dia, depth=25.0, cx=lx, cy=0.0, z0=-1.0, segments=64)
-        # Square 14.6 x 14.6 mm pocket on back of visor (z = 0 to 5.5 mm) for the 14x14 mm M12 lens base
-        base_pocket = rounded_rect_prism(
-            width=p.lens_base_size + 0.8,
-            height=p.lens_base_size + 0.8,
-            depth=5.5,
-            radius=0.8,
+        # Front Ø18.2 mm x 0.8 mm 45-deg bezel chamfer at top of turret (z = turret_h - 1.1 to turret_h)
+        front_chamfer = mf.Manifold.cylinder(
+            1.2,
+            p.lens_visor_bore_dia * 0.5 - 0.3,
+            (p.lens_visor_bore_dia + 1.6) * 0.5,
+            64,
+        ).translate([lx, 0.0, turret_h - 1.1])
+        visor = visor - front_chamfer
+
+        # Square 15.2 x 15.2 mm pocket on back of visor (z = 0 to 4.7 mm, Y = -7.6..+7.6 mm) for 14x14 mm M12 base,
+        # with 45-deg conical corner transition (z = 4.7 to 7.45 mm) into the Ø16.6 mm circular bore!
+        base_col = rounded_rect_prism(
+            width=p.lens_base_size + 1.2,
+            height=p.lens_base_size + 1.2,
+            depth=8.0,
+            radius=1.0,
             center_xy=(lx, 0.0),
             z0=-0.1,
         )
-        visor = visor - base_pocket
+        base_cone = (
+            cylinder_z(dia=24.0, depth=4.8, cx=lx, cy=0.0, z0=-0.1, segments=64)
+            + mf.Manifold.cylinder(2.8, 10.6, 7.8, 64).translate([lx, 0.0, 4.65])
+        )
+        visor = visor - (base_col ^ base_cone)
 
-    # 6. Cut out bottom-center arch for Mini-USB connector & plug
-    usb_arch = rounded_rect_prism(
-        width=p.usb_bay_inner_width + 0.6,
-        height=11.0,
-        depth=12.0,
-        radius=2.0,
-        center_xy=(0.0, -outer_h * 0.5 + 2.0),
-        z0=-0.5,
+    # 6. Cut out bottom-center arch for Mini-USB connector & plug (45-deg vaulted arch roof, zero supports)
+    usb_arch_base = rounded_rect_prism(
+        width=p.usb_bay_inner_width + 0.8,
+        height=8.8,
+        depth=4.2,
+        radius=1.6,
+        center_xy=(0.0, -outer_h * 0.5 + 3.2),
+        z0=-0.1,
     )
-    visor = visor - usb_arch
+    usb_arch_top = rounded_rect_prism(
+        width=5.0,
+        height=7.2,
+        depth=0.2,
+        radius=1.0,
+        center_xy=(0.0, -outer_h * 0.5 + 2.4),
+        z0=8.2,
+    )
+    visor = visor - (usb_arch_base + usb_arch_top).hull()
 
-    # 7. Drill 4 outer corner M2 screw holes + counterbores (and 4 inner M2 holes)
-    corner_holes = [
-        (-p.hole_outer_x, +p.hole_y),
-        (+p.hole_outer_x, +p.hole_y),
-        (-p.hole_outer_x, -p.hole_y),
-        (+p.hole_outer_x, -p.hole_y),
-    ]
-    for hx, hy in corner_holes:
-        visor = visor - cylinder_z(dia=2.3, depth=20.0, cx=hx, cy=hy, z0=-1.0)
-        visor = visor - cylinder_z(dia=4.4, depth=12.0, cx=hx, cy=hy, z0=4.5)
+    # 7. Drill 4x Outer M3 Casing Fastening Through-Holes + Counterbores (X = +-56.5 mm, Y = +-9.0 mm, 113.0 x 18.0 mm)
+    for ex in (-p.outer_m3_ear_x, +p.outer_m3_ear_x):
+        for ey in (-p.hole_y, +p.hole_y):
+            visor = visor - cylinder_z(dia=p.m3_clearance_dia, depth=22.0, cx=ex, cy=ey, z0=-1.0)
+            visor = visor - cylinder_z(dia=6.5, depth=15.0, cx=ex, cy=ey, z0=4.5)
 
-    for hx in (-p.hole_inner_inner_x, +p.hole_inner_inner_x):
+    # 8. Drill 4x Optional M2 Board Corner Through-Holes + Counterbores (X = +-48.0 mm, Y = +-9.0 mm, 96.0 x 18.0 mm)
+    for hx in (-p.hole_outer_x, +p.hole_outer_x):
         for hy in (-p.hole_y, +p.hole_y):
-            visor = visor - cylinder_z(dia=2.3, depth=20.0, cx=hx, cy=hy, z0=-1.0)
-            visor = visor - cylinder_z(dia=4.2, depth=10.0, cx=hx, cy=hy, z0=5.5)
+            visor = visor - cylinder_z(dia=2.4, depth=22.0, cx=hx, cy=hy, z0=-1.0)
+            visor = visor - cylinder_z(dia=4.4, depth=15.0, cx=hx, cy=hy, z0=5.2)
 
     return visor
 
@@ -683,10 +737,12 @@ def manifold_to_trimesh(m: mf.Manifold) -> trimesh.Trimesh:
 def generate_all(out_dir: Path, params: CameraMountParams) -> dict:
     out_dir.mkdir(parents=True, exist_ok=True)
     back_solid = build_back_mount(params)
+    visor_solid = build_front_visor(params)
     specs = [
         ("horace_cam_back_mount_v2.stl", back_solid),
         ("horace_cam_back_mount.stl", back_solid),
-        ("horace_cam_front_visor.stl", build_front_visor(params)),
+        ("horace_cam_front_visor_v2.stl", visor_solid),
+        ("horace_cam_front_visor.stl", visor_solid),
         ("horace_cam_usb_shim.stl", build_usb_shim(params)),
     ]
     summary = {"parameters_mm": asdict(params), "files": {}}
@@ -716,7 +772,7 @@ def generate_all(out_dir: Path, params: CameraMountParams) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out-dir", type=Path, default=Path(__file__).resolve().parent)
-    parser.add_argument("--lens-baseline", type=float, default=80.0, help="Stereo lens center-to-center baseline (mm)")
+    parser.add_argument("--lens-baseline", type=float, default=85.0, help="Stereo lens center-to-center baseline (mm)")
     parser.add_argument("--usb-plug-width", type=float, default=10.2, help="Mini-USB plug overmold width for shim (mm)")
     parser.add_argument("--usb-plug-depth", type=float, default=7.0, help="Mini-USB plug overmold depth for shim (mm)")
     parser.add_argument("--usb-cable-dia", type=float, default=4.5, help="Mini-USB cable neck OD for shim (mm)")
