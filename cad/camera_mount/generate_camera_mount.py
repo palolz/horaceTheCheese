@@ -294,26 +294,40 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
     body = body + gusset_plate + spine_block + left_rib + right_rib
 
     # 3. Integrated Mini-USB strain-relief collar & M3 Heat-Set Insert Pinch Jaws
+    #    IMPORTANT: All raised collar/jaw geometry (Z > 9.8 mm) stays strictly below Y = -16.2 mm
+    #    (1.4 mm clear of the Front Visor's Y = -14.8 mm bottom wall so it NEVER interferes with the Front Visor!).
+    #    In the neck zone closest to the USB port (Y = -16.2..-11.6 mm), the outer walls stay at Z <= 9.8 mm
+    #    and the inner 10.5 mm USB plug channel is cut down to Z = 6.4 mm (below the Z = 6.8 mm PCB shelf).
     clamp_outer_w = p.usb_bay_inner_width + 7.0  # 20.0 mm outer collar width
-    clamp_y_top = -outer_h * 0.5 + 1.5           # -13.3 mm (overlaps bottom wall)
+    clamp_y_top = -16.2                          # strictly 1.4 mm below Front Visor bottom edge (Y = -14.8 mm)
     clamp_y_bot = spine_y_bot                    # -26.6 mm (flush with bottom of bracket spine)
-    clamp_h = clamp_y_top - clamp_y_bot          # 13.3 mm
-    clamp_yc = 0.5 * (clamp_y_top + clamp_y_bot) # -19.95 mm
+    clamp_h = clamp_y_top - clamp_y_bot          # 10.4 mm
+    clamp_yc = 0.5 * (clamp_y_top + clamp_y_bot) # -21.4 mm
     clamp_z_top = p.back_thickness + p.pcb_thickness + p.usb_bay_inner_depth + 1.4  # 18.8 mm
+
+    # Low neck bridge (Y = -17.0..-12.5 mm, Z = 0..9.8 mm) connecting the raised collar to the bottom wall
+    usb_neck_wall = rounded_rect_prism(
+        width=clamp_outer_w,
+        height=4.5,
+        depth=p.shell_front_z,
+        radius=2.5,
+        center_xy=(0.0, -14.75),
+        z0=0.0,
+    )
 
     usb_collar = rounded_rect_prism(
         width=clamp_outer_w,
         height=clamp_h,
         depth=clamp_z_top,
-        radius=3.0,
+        radius=2.8,
         center_xy=(0.0, clamp_yc),
         z0=0.0,
     )
 
-    # Reinforced M3 pinch-clamp jaws (30.0 mm wide across jaws, housing an M3 brass heat-set insert on the right jaw!)
+    # Reinforced M3 pinch-clamp jaws (30.0 mm wide across jaws, Y = -25.8..-17.4 mm, strictly below Y = -16.2 mm!)
     jaw_w = 30.0
     jaw_h = 8.4
-    jaw_yc = clamp_yc - 0.8                      # -20.75 mm
+    jaw_yc = -21.6                               # Y = -25.8 to -17.4 mm
     jaw_z0 = 7.2
     jaw_depth = 10.6  # z = 7.2 to 17.8 mm
     pinch_jaws = rounded_rect_prism(
@@ -324,7 +338,18 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
         center_xy=(0.0, jaw_yc),
         z0=jaw_z0,
     )
-    body = body + usb_collar + pinch_jaws
+    body = body + usb_neck_wall + usb_collar + pinch_jaws
+
+    # Trim any spine/collar geometry in Y >= -16.2 mm above Z = 9.8 mm so the Front Visor mating zone is 100% clear
+    visor_zone_trim = rounded_rect_prism(
+        width=outer_w + 10.0,
+        height=40.0,
+        depth=20.0,
+        radius=1.0,
+        center_xy=(0.0, 3.8),  # spans Y = -16.2 to +23.8 mm
+        z0=p.shell_front_z,
+    )
+    body = body - visor_zone_trim
 
     # 4. Cut out the PCB cradle cavity (101.2 x 23.2 mm, from z = p.back_thickness [6.8] to shell_front_z + 1)
     pcb_pocket = rounded_rect_prism(
@@ -339,7 +364,7 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
 
     # 5. Cut out the rear SMD clearance pocket (98.0 x 18.0 mm, z = 5.4 to 6.8 mm -> leaves a 5.4 mm solid backplate!)
     #    Spans X = -49.0..+49.0 mm so the rear of the 85.0 mm baseline lens sensors (X = +-42.5 mm, base +-35.5..+-49.5 mm)
-    #    has full SMD clearance while the 4 corner bosses at X = +-48.0, Y = +-9.0 mm are added back below.
+    #    has full SMD clearance while the 8 PCB M2 bosses (4x corners at X = +-48.0, 4x middle at X = +-26.1) are added back below.
     smd_floor_z = p.back_thickness - p.pcb_recess_depth  # 5.4 mm
     smd_pocket = rounded_rect_prism(
         width=p.pcb_width - 2.0,
@@ -363,27 +388,12 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
     )
     body = body + center_pad
 
-    # - 4x Corner PCB Bosses at X = +-48.0, Y = +-9.0 mm (96.0 x 18.0 mm C-to-C, Ø6.0 mm pads up to z=6.8 mm)
-    for bx in (-p.hole_outer_x, +p.hole_outer_x):
+    # - 8x PCB M2 Heat-Set Insert Seating Bosses (Ø6.0 mm pads flush at z = 6.8 mm):
+    #   * 4x Outer Corner Board Holes: X = +-48.0 mm, Y = +-9.0 mm (96.0 x 18.0 mm C-to-C)
+    #   * 4x Middle Board Holes (3rd from left/right): X = +-26.1 mm, Y = +-9.0 mm (52.2 x 18.0 mm C-to-C)
+    for bx in (-p.hole_outer_x, +p.hole_outer_x, -p.hole_inner_outer_x, +p.hole_inner_outer_x):
         for by in (-p.hole_y, +p.hole_y):
             body = body + cylinder_z(dia=6.0, depth=p.pcb_recess_depth, cx=bx, cy=by, z0=smd_floor_z)
-
-    # - 8x Inner FFC-flanking PCB Support Bosses at X = +-26.1 and +-22.1 mm, Y = +-9.0 mm
-    for bx in (-p.hole_inner_outer_x, +p.hole_inner_outer_x, -p.hole_inner_inner_x, +p.hole_inner_inner_x):
-        for by in (-p.hole_y, +p.hole_y):
-            body = body + cylinder_z(dia=5.2, depth=p.pcb_recess_depth, cx=bx, cy=by, z0=smd_floor_z)
-
-    # - 4x Integrated Press-Fit PCB Locating Pins (Ø1.85 mm x 2.2 mm tall) at X = +-26.1, Y = +-9.0 mm
-    #   Drops straight into four of the PCB's Ø2.0 mm holes so no tiny M2 nuts/bolts are required!
-    for bx in (-p.hole_inner_outer_x, +p.hole_inner_outer_x):
-        for by in (-p.hole_y, +p.hole_y):
-            pin_base = mf.Manifold.cylinder(1.5, p.pcb_locator_pin_dia * 0.5, p.pcb_locator_pin_dia * 0.5, 36).translate(
-                [bx, by, p.back_thickness - 0.1]
-            )
-            pin_tip = mf.Manifold.cylinder(0.8, p.pcb_locator_pin_dia * 0.5, 0.72, 36).translate(
-                [bx, by, p.back_thickness + 1.4]
-            )
-            body = body + pin_base + pin_tip
 
     # 6. HEAT-SET THREADED INSERT BORES (ZERO HEX NUT RECESSES!)
     # 6a. 4x Outer Corner M3 Heat-Set Insert Bosses (X = +-56.5 mm, Y = +-9.0 mm, 113.0 x 18.0 mm C-to-C, Ø4.0 mm bore x 6.5 mm deep)
@@ -398,9 +408,9 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
                 cy=ey,
             )
 
-    # 6b. 4x PCB End M2 Heat-Set Insert Bores (X = +-48.0 mm, Y = +-9.0 mm, 96.0 x 18.0 mm C-to-C, Ø3.2 mm bore x 4.5 mm deep)
-    #     Blind from z = 6.8 mm down to z = 2.3 mm (leaves 2.3 mm solid sealed floor at z=0!).
-    for bx in (-p.hole_outer_x, +p.hole_outer_x):
+    # 6b. 8x PCB M2 Heat-Set Insert Bores (4x Corners at X = +-48.0 mm & 4x Middle at X = +-26.1 mm, Y = +-9.0 mm)
+    #     Ø3.2 mm bore x 4.5 mm deep, blind from z = 6.8 mm down to z = 2.3 mm (leaves 2.3 mm solid sealed floor at z=0!).
+    for bx in (-p.hole_outer_x, +p.hole_outer_x, -p.hole_inner_outer_x, +p.hole_inner_outer_x):
         for by in (-p.hole_y, +p.hole_y):
             body = body - blind_insert_bore_from_top_z(
                 bore_dia=p.m2_insert_bore_dia,
@@ -450,18 +460,21 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
         )
 
     # 7. Carve the Mini-USB plug tunnel & M3 Heat-Set Insert Pinch-Clamp Jaw Bores
+    #    In the neck zone closest to the USB port (Y = -16.8..-10.5 mm), cut the 10.5 mm wide USB channel
+    #    all the way down to z = 6.4 mm (below the z = 6.8 mm PCB shelf) and open through the top so
+    #    it never interferes with the USB connector or the Front Visor!
     usb_neck = rounded_rect_prism(
-        width=p.usb_port_width + 3.0,
-        height=7.0,
-        depth=8.8,
+        width=p.usb_port_width + 3.5,
+        height=7.5,
+        depth=14.0,
         radius=1.0,
-        center_xy=(0.0, -cav_h * 0.5),
+        center_xy=(0.0, -13.5),
         z0=p.back_thickness - 0.4,
     )
     usb_bay_z0 = p.back_thickness + 0.6  # z = 7.4..16.4 mm (well in front of the z=0..6.8 mm spine!)
     usb_bay = rounded_rect_prism(
         width=p.usb_bay_inner_width,
-        height=clamp_h + 4.0,
+        height=clamp_h + 6.0,
         depth=p.usb_bay_inner_depth,
         radius=1.6,
         center_xy=(0.0, clamp_yc),
@@ -469,10 +482,10 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
     )
     shim_groove = rounded_rect_prism(
         width=p.usb_bay_inner_width + 1.4,
-        height=clamp_h - 2.5,
+        height=clamp_h - 2.0,
         depth=3.0,
         radius=0.8,
-        center_xy=(0.0, clamp_yc - 0.5),
+        center_xy=(0.0, clamp_yc - 0.3),
         z0=usb_bay_z0 + 3.0,
     )
     flex_slit = rounded_rect_prism(
@@ -480,7 +493,7 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
         height=clamp_h + 2.0,
         depth=5.5,
         radius=0.4,
-        center_xy=(0.0, clamp_yc - 0.8),
+        center_xy=(0.0, clamp_yc - 0.3),
         z0=usb_bay_z0 + p.usb_bay_inner_depth - 1.0,
     )
     body = body - usb_neck - usb_bay - shim_groove - flex_slit
@@ -523,16 +536,16 @@ def build_front_visor(p: CameraMountParams) -> mf.Manifold:
     Matches the 122.2 x 29.6 mm upper housing of `horace_cam_back_mount_v2.stl`:
       - 85.0 mm lens center-to-center baseline (X = +-42.5 mm, Y = 0.0 mm = 11.0 mm from 22.0 mm board edges)
       - 4x Outer M3 fastening through-holes + Ø6.5 mm counterbores at X = +-56.5 mm, Y = +-9.0 mm (113.0 x 18.0 mm)
-      - 4x Optional M2 board corner through-holes + Ø4.6 mm counterbores at X = +-48.0 mm, Y = +-9.0 mm (96.0 x 18.0 mm)
+      - NO circuit-board screw holes through the front faceplate (8x blind Ø4.8 x 2.8 mm screw-head pockets underneath!)
+      - Enlarged 70.0 x 16.8 mm FFC ribbon cable crevice (12.8 mm total Z-clearance above PCB for 10mm high x 13mm wide ribbons)
       - 15.2 x 15.2 mm internal square pockets for the 14.0 x 14.0 mm M12 lens bases with 45-deg self-supporting roofs
-      - 45-deg vaulted central FFC ribbon chamber & Mini-USB arch for 100% support-free flat printing on Z = 0.0 mm
     """
     cav_w = p.pcb_width + 2.0 * p.pcb_clearance_x  # 101.2 mm
     cav_h = p.pcb_height + 2.0 * p.pcb_clearance   # 23.2 mm
     outer_w = 2.0 * p.outer_m3_ear_x + 8.0         # 121.0 mm (122.2 mm across Ø9.2 mm corner ears)
     outer_h = cav_h + 2.0 * p.wall_thickness       # 29.6 mm (Y = -14.8..+14.8 mm)
 
-    visor_plate_h = 10.0  # main visor body thickness (z = 0.0 to 10.0 mm)
+    visor_plate_h = 14.5  # main visor body thickness (z = 0.0 to 14.5 mm -> 15.9 mm above PCB front face!)
 
     # 1. Main visor body + 4x Ø9.2 mm outer M3 corner ears (matching back cover upper shell)
     visor = rounded_rect_prism(
@@ -547,22 +560,14 @@ def build_front_visor(p: CameraMountParams) -> mf.Manifold:
         for ey in (-p.hole_y, +p.hole_y):
             visor = visor + cylinder_z(dia=9.2, depth=visor_plate_h, cx=ex, cy=ey, z0=0.0)
 
-    # 2. Raised binocular lens turrets at X = -42.5 and +42.5 mm, Y = 0.0 mm (85.0 mm baseline, z = 0 to 13.2 mm)
-    #    Lower turret body (z = 0..10.0 mm, Ø22.4 mm) + tapered upper binocular bezel (z = 10.0..13.2 mm, Ø20.4 -> Ø19.4 mm)
+    # 2. Raised binocular lens turrets at X = -42.5 and +42.5 mm, Y = 0.0 mm (85.0 mm baseline, z = 0 to 15.5 mm)
     turret_od = p.lens_visor_bore_dia + 5.8  # 22.4 mm OD
-    turret_h = 13.2
+    turret_h = 15.5
     for lx in (-p.lens_baseline * 0.5, +p.lens_baseline * 0.5):
-        visor = visor + cylinder_z(dia=turret_od, depth=visor_plate_h, cx=lx, cy=0.0, z0=0.0, segments=64)
-        upper_bezel = mf.Manifold.cylinder(
-            turret_h - visor_plate_h + 0.2,
-            10.2,
-            9.7,
-            64,
-        ).translate([lx, 0.0, visor_plate_h - 0.2])
-        visor = visor + upper_bezel
+        visor = visor + cylinder_z(dia=turret_od, depth=turret_h, cx=lx, cy=0.0, z0=0.0, segments=64)
 
-    # 3. Retro 70s sun-visor brow along the upper edge (y = +10.6 to +14.8 mm, z = 0 to 14.5 mm)
-    brow_depth = 14.5
+    # 3. Retro 70s sun-visor brow along the upper edge (y = +10.6 to +14.8 mm, z = 0 to 16.8 mm)
+    brow_depth = 16.8
     top_brow = rounded_rect_prism(
         width=outer_w,
         height=4.2,
@@ -574,42 +579,48 @@ def build_front_visor(p: CameraMountParams) -> mf.Manifold:
     outer_clip = rounded_rect_prism(
         width=outer_w,
         height=outer_h,
-        depth=20.0,
+        depth=22.0,
         radius=p.corner_radius,
         center_xy=(0.0, 0.0),
         z0=0.0,
     )
     visor = visor + (top_brow ^ outer_clip)
 
-    # 4. Cut out inner electronics & FFC ribbon protection chamber between the two lenses (X = -33.0..+33.0 mm)
-    #    Uses a 45-deg vaulted roof (z = 2.9 to 6.8 mm) so it prints flat on Z=0 with zero supports!
+    # 4. Enlarged FFC Ribbon Cable & Electronics Protection Crevice between the two lenses (X = -35.0..+35.0 mm):
+    #    - 70.0 mm long in X x 16.8 mm wide in Y (Y = -8.4..+8.4 mm, giving 1.9 mm/side margin around 13.0 mm wide ribbons)
+    #      from z = 0.0 up to z = 8.8 mm (10.2 mm above PCB front face),
+    #    - Tapered at 45-deg from z = 8.8 mm up to z = 11.4 mm (64.8 x 11.6 mm), providing 11.4 + 1.4 = 12.8 mm total
+    #      Z-height clearance above the PCB front face (2.8 mm air gap above 10.0 mm high bowed ribbons) while keeping
+    #      a solid 3.1 mm thick front protective roof (z = 11.4..14.5 mm)!
     ribbon_base = rounded_rect_prism(
-        width=66.0,
-        height=14.4,
-        depth=3.0,
+        width=70.0,
+        height=16.8,
+        depth=8.9,
         radius=2.0,
         center_xy=(0.0, 0.0),
         z0=-0.1,
     )
     ribbon_top = rounded_rect_prism(
-        width=60.0,
-        height=6.0,
+        width=64.8,
+        height=11.6,
         depth=0.2,
         radius=1.5,
         center_xy=(0.0, 0.0),
-        z0=6.8,
+        z0=11.2,
     )
     ribbon_chamber = (ribbon_base + ribbon_top).hull()
     visor = visor - ribbon_chamber
 
-    # 4b. 4x Clearance dimples (Ø3.2 x 1.6 mm conical) at X = +-26.1, Y = +-9.0 mm over the Back Cover locating pins
-    for px in (-p.hole_inner_outer_x, +p.hole_inner_outer_x):
-        for py in (-p.hole_y, +p.hole_y):
+    # 4b. 8x Blind Internal M2 Screw-Head Clearance Pockets on Underside (Z = 0.0 mm, NO front faceplate holes!):
+    #     Ø4.8 mm x 2.8 mm deep + 45-deg conical roof (gives 1.4 + 2.8 = 4.2 mm screw-head clearance above PCB front face)
+    #     at the 4 outer board corners (X = +-48.0, Y = +-9.0 mm) and 4 middle board holes (X = +-26.1, Y = +-9.0 mm).
+    for bx in (-p.hole_outer_x, +p.hole_outer_x, -p.hole_inner_outer_x, +p.hole_inner_outer_x):
+        for by in (-p.hole_y, +p.hole_y):
             visor = visor - blind_insert_bore_from_bottom_z(
-                bore_dia=3.2,
-                depth=1.6,
-                cx=px,
-                cy=py,
+                bore_dia=4.8,
+                depth=2.8,
+                cx=bx,
+                cy=by,
                 z0=0.0,
                 chamfer_extra=0.4,
                 chamfer_depth=0.3,
@@ -629,19 +640,19 @@ def build_front_visor(p: CameraMountParams) -> mf.Manifold:
         ).translate([lx, 0.0, turret_h - 1.1])
         visor = visor - front_chamfer
 
-        # Square 15.2 x 15.2 mm pocket on back of visor (z = 0 to 4.7 mm, Y = -7.6..+7.6 mm) for 14x14 mm M12 base,
-        # with 45-deg conical corner transition (z = 4.7 to 7.45 mm) into the Ø16.6 mm circular bore!
+        # Square 15.2 x 15.2 mm pocket on back of visor (z = 0 to 4.8 mm, Y = -7.6..+7.6 mm) for 14x14 mm M12 base,
+        # with 45-deg conical corner transition (z = 4.8 to 7.55 mm) into the Ø16.6 mm circular bore!
         base_col = rounded_rect_prism(
             width=p.lens_base_size + 1.2,
             height=p.lens_base_size + 1.2,
-            depth=8.0,
+            depth=8.2,
             radius=1.0,
             center_xy=(lx, 0.0),
             z0=-0.1,
         )
         base_cone = (
-            cylinder_z(dia=24.0, depth=4.8, cx=lx, cy=0.0, z0=-0.1, segments=64)
-            + mf.Manifold.cylinder(2.8, 10.6, 7.8, 64).translate([lx, 0.0, 4.65])
+            cylinder_z(dia=24.0, depth=4.9, cx=lx, cy=0.0, z0=-0.1, segments=64)
+            + mf.Manifold.cylinder(2.8, 10.6, 7.8, 64).translate([lx, 0.0, 4.75])
         )
         visor = visor - (base_col ^ base_cone)
 
@@ -664,17 +675,12 @@ def build_front_visor(p: CameraMountParams) -> mf.Manifold:
     )
     visor = visor - (usb_arch_base + usb_arch_top).hull()
 
-    # 7. Drill 4x Outer M3 Casing Fastening Through-Holes + Counterbores (X = +-56.5 mm, Y = +-9.0 mm, 113.0 x 18.0 mm)
+    # 7. Drill ONLY the 4x Outer M3 Casing Fastening Through-Holes + Counterbores (X = +-56.5 mm, Y = +-9.0 mm, 113.0 x 18.0 mm)
+    #    (No circuit-board screw holes pass through the front faceplate!)
     for ex in (-p.outer_m3_ear_x, +p.outer_m3_ear_x):
         for ey in (-p.hole_y, +p.hole_y):
-            visor = visor - cylinder_z(dia=p.m3_clearance_dia, depth=22.0, cx=ex, cy=ey, z0=-1.0)
-            visor = visor - cylinder_z(dia=6.5, depth=15.0, cx=ex, cy=ey, z0=4.5)
-
-    # 8. Drill 4x Optional M2 Board Corner Through-Holes + Counterbores (X = +-48.0 mm, Y = +-9.0 mm, 96.0 x 18.0 mm)
-    for hx in (-p.hole_outer_x, +p.hole_outer_x):
-        for hy in (-p.hole_y, +p.hole_y):
-            visor = visor - cylinder_z(dia=2.4, depth=22.0, cx=hx, cy=hy, z0=-1.0)
-            visor = visor - cylinder_z(dia=4.4, depth=15.0, cx=hx, cy=hy, z0=5.2)
+            visor = visor - cylinder_z(dia=p.m3_clearance_dia, depth=25.0, cx=ex, cy=ey, z0=-1.0)
+            visor = visor - cylinder_z(dia=6.5, depth=15.0, cx=ex, cy=ey, z0=5.5)
 
     return visor
 

@@ -56,8 +56,8 @@
         42.4,
         18.8
       ],
-      "volume_cm3": 32.82,
-      "triangles": 11418
+      "volume_cm3": 32.29,
+      "triangles": 11826
     },
     "horace_cam_back_mount.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_back_mount.stl",
@@ -67,8 +67,8 @@
         42.4,
         18.8
       ],
-      "volume_cm3": 32.82,
-      "triangles": 11418
+      "volume_cm3": 32.29,
+      "triangles": 11826
     },
     "horace_cam_front_visor_v2.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_front_visor_v2.stl",
@@ -76,10 +76,10 @@
       "bounding_box_mm": [
         122.2,
         29.6,
-        14.5
+        16.8
       ],
-      "volume_cm3": 26.24,
-      "triangles": 7794
+      "volume_cm3": 31.38,
+      "triangles": 7094
     },
     "horace_cam_front_visor.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_front_visor.stl",
@@ -87,10 +87,10 @@
       "bounding_box_mm": [
         122.2,
         29.6,
-        14.5
+        16.8
       ],
-      "volume_cm3": 26.24,
-      "triangles": 7794
+      "volume_cm3": 31.38,
+      "triangles": 7094
     },
     "horace_cam_usb_shim.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_usb_shim.stl",
