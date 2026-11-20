@@ -32,10 +32,10 @@ import trimesh
 class CameraMountParams:
     # --- 1. Stereo Camera PCB & Optics (measured from 5x5 mm grid photos + Onshape fit check) ---
     pcb_width: float = 100.0           # mm (user-verified 100.0 mm board length)
-    pcb_height: float = 20.0           # mm (4.0 cm to 6.0 cm on grid = 4 x 5 mm squares)
+    pcb_height: float = 22.0           # mm (user-verified 22.0 mm board width)
     pcb_thickness: float = 1.6         # mm (standard FR4)
     pcb_clearance_x: float = 0.6       # mm per side X pocket clearance -> 101.2 mm cavity width
-    pcb_clearance: float = 0.5         # mm per side Y pocket clearance -> 21.0 mm cavity height
+    pcb_clearance: float = 0.6         # mm per side Y pocket clearance -> 23.2 mm cavity height
 
     lens_baseline: float = 80.0        # mm center-to-center (X = -40.0 and +40.0 mm)
     lens_base_size: float = 14.0       # mm square M12 lens holder base on PCB
@@ -48,7 +48,7 @@ class CameraMountParams:
     hole_outer_x: float = 48.0         # mm (+-48.0 mm = 96.0 mm C-to-C board end mounting holes)
     hole_inner_outer_x: float = 26.1   # mm (+-26.1 mm = 52.2 mm C-to-C, verified inner locating pins)
     hole_inner_inner_x: float = 22.1   # mm (+-22.1 mm = 44.2 mm C-to-C, flanking ribbons)
-    hole_y: float = 8.5                # mm (+-8.5 mm = 17.0 mm vertical C-to-C)
+    hole_y: float = 9.0                # mm (+-9.0 mm = 18.0 mm vertical C-to-C across 22.0 mm board)
     pcb_m2_hole_dia: float = 2.0       # mm M2 pilot/through hole in bosses
 
     # --- 2. WAVE ROVER Expansion Plate 90° Front Bracket (from DXF + P1044916) ---
@@ -230,11 +230,11 @@ def blind_insert_bore_from_bottom_z(
 def build_back_mount(p: CameraMountParams) -> mf.Manifold:
     """Build `horace_cam_back_mount_v2.stl` (100% flat Z=0 rear face, M3/M2 heat-set inserts, zero hex nuts)."""
     cav_w = p.pcb_width + 2.0 * p.pcb_clearance_x  # 101.2 mm (100.0 mm board + 0.6 mm clearance per side)
-    cav_h = p.pcb_height + 2.0 * p.pcb_clearance   # 21.0 mm  (20.0 mm board + 0.5 mm clearance per side)
-    # Widen outer shell to 121.0 x 27.4 mm (122.2 mm across Ø9.2 mm corner bosses) so 4x M3 heat-set insert
-    # bosses at X = +-56.5 mm (113.0 mm C-to-C) sit completely outside the 101.2 mm PCB pocket!
+    cav_h = p.pcb_height + 2.0 * p.pcb_clearance   # 23.2 mm  (22.0 mm board + 0.6 mm clearance per side)
+    # Widen outer shell to 121.0 x 29.6 mm (122.2 mm across Ø9.2 mm corner bosses) so 4x M3 heat-set insert
+    # bosses at X = +-56.5 mm (113.0 mm C-to-C) sit completely outside the 101.2 x 23.2 mm PCB pocket!
     outer_w = 2.0 * p.outer_m3_ear_x + 8.0         # 121.0 mm
-    outer_h = cav_h + 2.0 * p.wall_thickness       # 27.4 mm
+    outer_h = cav_h + 2.0 * p.wall_thickness       # 29.6 mm (Y = -14.8..+14.8 mm)
 
     # 1. Main upper camera housing body (z = 0.0 to shell_front_z = 9.8 mm)
     # Entire rear face at z = 0.0 mm is 100% flat on the print bed!
@@ -251,18 +251,18 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
         for ey in (-p.hole_y, +p.hole_y):
             body = body + cylinder_z(dia=9.2, depth=p.shell_front_z, cx=ex, cy=ey, z0=0.0)
 
-    # 2. Structural Gusset Wings & Wide Lower Bracket Spine (y = -25.5 to -10.0 mm)
+    # 2. Structural Gusset Wings & Wide Lower Bracket Spine (shifted down 1.1 mm for 23.2 mm pocket height)
     # Eliminates the v1 narrow neck weak point by sweeping a 34 mm wide lower bracket block
     # smoothly out to X = +-48.0 mm on the main camera body, plus raised diagonal gusset ribs!
-    spine_y_bot = -25.5
-    spine_y_top = -10.0
+    spine_y_bot = -26.6
+    spine_y_top = -11.1
     gusset_poly = [
-        (-48.0, -11.5),
-        (+48.0, -11.5),
-        (+29.0, -18.5),
+        (-48.0, -12.6),
+        (+48.0, -12.6),
+        (+29.0, -19.6),
         (+17.0, spine_y_bot),
         (-17.0, spine_y_bot),
-        (-29.0, -18.5),
+        (-29.0, -19.6),
     ]
     gusset_plate = polygon_prism_z(gusset_poly, depth=p.back_thickness + 0.8, z0=0.0)
 
@@ -278,16 +278,16 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
 
     # Two raised diagonal stiffening ribs (z = 0.0 to shell_front_z = 9.8 mm) triangulating bracket to camera wings
     left_rib_pts = [
-        (-13.5, -24.5),
-        (-9.5, -24.5),
-        (-36.0, -11.5),
-        (-43.0, -11.5),
+        (-13.5, -25.6),
+        (-9.5, -25.6),
+        (-36.0, -12.6),
+        (-43.0, -12.6),
     ]
     right_rib_pts = [
-        (+9.5, -24.5),
-        (+13.5, -24.5),
-        (+43.0, -11.5),
-        (+36.0, -11.5),
+        (+9.5, -25.6),
+        (+13.5, -25.6),
+        (+43.0, -12.6),
+        (+36.0, -12.6),
     ]
     left_rib = polygon_prism_z(left_rib_pts, depth=p.shell_front_z, z0=0.0)
     right_rib = polygon_prism_z(right_rib_pts, depth=p.shell_front_z, z0=0.0)
@@ -295,10 +295,10 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
 
     # 3. Integrated Mini-USB strain-relief collar & M3 Heat-Set Insert Pinch Jaws
     clamp_outer_w = p.usb_bay_inner_width + 7.0  # 20.0 mm outer collar width
-    clamp_y_top = -outer_h * 0.5 + 1.5           # overlaps bottom wall
-    clamp_y_bot = spine_y_bot                    # -25.5 mm (flush with bottom of bracket spine)
+    clamp_y_top = -outer_h * 0.5 + 1.5           # -13.3 mm (overlaps bottom wall)
+    clamp_y_bot = spine_y_bot                    # -26.6 mm (flush with bottom of bracket spine)
     clamp_h = clamp_y_top - clamp_y_bot          # 13.3 mm
-    clamp_yc = 0.5 * (clamp_y_top + clamp_y_bot) # -18.85 mm
+    clamp_yc = 0.5 * (clamp_y_top + clamp_y_bot) # -19.95 mm
     clamp_z_top = p.back_thickness + p.pcb_thickness + p.usb_bay_inner_depth + 1.4  # 18.8 mm
 
     usb_collar = rounded_rect_prism(
@@ -313,7 +313,7 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
     # Reinforced M3 pinch-clamp jaws (30.0 mm wide across jaws, housing an M3 brass heat-set insert on the right jaw!)
     jaw_w = 30.0
     jaw_h = 8.4
-    jaw_yc = clamp_yc - 0.8
+    jaw_yc = clamp_yc - 0.8                      # -20.75 mm
     jaw_z0 = 7.2
     jaw_depth = 10.6  # z = 7.2 to 17.8 mm
     pinch_jaws = rounded_rect_prism(
@@ -326,7 +326,7 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
     )
     body = body + usb_collar + pinch_jaws
 
-    # 4. Cut out the PCB cradle cavity (101.2 x 21.0 mm, from z = p.back_thickness [6.8] to shell_front_z + 1)
+    # 4. Cut out the PCB cradle cavity (101.2 x 23.2 mm, from z = p.back_thickness [6.8] to shell_front_z + 1)
     pcb_pocket = rounded_rect_prism(
         width=cav_w,
         height=cav_h,
@@ -337,11 +337,11 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
     )
     body = body - pcb_pocket
 
-    # 5. Cut out the rear SMD clearance pocket (z = 5.4 to 6.8 mm -> leaves a 5.4 mm solid backplate!)
+    # 5. Cut out the rear SMD clearance pocket (96.0 x 18.0 mm, z = 5.4 to 6.8 mm -> leaves a 5.4 mm solid backplate!)
     smd_floor_z = p.back_thickness - p.pcb_recess_depth  # 5.4 mm
     smd_pocket = rounded_rect_prism(
         width=p.pcb_width - 4.0,
-        height=p.pcb_height - 3.4,
+        height=p.pcb_height - 4.0,
         depth=p.pcb_recess_depth + 0.5,
         radius=1.5,
         center_xy=(0.0, 0.0),
@@ -361,17 +361,17 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
     )
     body = body + center_pad
 
-    # - 4x Corner PCB Bosses at X = +-48.0, Y = +-8.5 mm (96.0 mm C-to-C, Ø6.0 mm pads up to z=6.8 mm)
+    # - 4x Corner PCB Bosses at X = +-48.0, Y = +-9.0 mm (96.0 x 18.0 mm C-to-C, Ø6.0 mm pads up to z=6.8 mm)
     for bx in (-p.hole_outer_x, +p.hole_outer_x):
         for by in (-p.hole_y, +p.hole_y):
             body = body + cylinder_z(dia=6.0, depth=p.pcb_recess_depth, cx=bx, cy=by, z0=smd_floor_z)
 
-    # - 8x Inner FFC-flanking PCB Support Bosses at X = +-26.1 and +-22.1 mm, Y = +-8.5 mm
+    # - 8x Inner FFC-flanking PCB Support Bosses at X = +-26.1 and +-22.1 mm, Y = +-9.0 mm
     for bx in (-p.hole_inner_outer_x, +p.hole_inner_outer_x, -p.hole_inner_inner_x, +p.hole_inner_inner_x):
         for by in (-p.hole_y, +p.hole_y):
             body = body + cylinder_z(dia=5.2, depth=p.pcb_recess_depth, cx=bx, cy=by, z0=smd_floor_z)
 
-    # - 4x Integrated Press-Fit PCB Locating Pins (Ø1.85 mm x 2.2 mm tall) at X = +-26.1, Y = +-8.5 mm
+    # - 4x Integrated Press-Fit PCB Locating Pins (Ø1.85 mm x 2.2 mm tall) at X = +-26.1, Y = +-9.0 mm
     #   Drops straight into four of the PCB's Ø2.0 mm holes so no tiny M2 nuts/bolts are required!
     for bx in (-p.hole_inner_outer_x, +p.hole_inner_outer_x):
         for by in (-p.hole_y, +p.hole_y):
@@ -384,8 +384,8 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
             body = body + pin_base + pin_tip
 
     # 6. HEAT-SET THREADED INSERT BORES (ZERO HEX NUT RECESSES!)
-    # 6a. 4x Outer Corner M3 Heat-Set Insert Bosses (X = +-56.5 mm, Y = +-8.5 mm, 113.0 mm C-to-C, Ø4.0 mm bore x 6.5 mm deep)
-    #     Positioned completely outside the 101.2 mm (X = +-50.6 mm) PCB pocket with Ø9.2 mm bosses (inner edge at X = +-51.9 mm).
+    # 6a. 4x Outer Corner M3 Heat-Set Insert Bosses (X = +-56.5 mm, Y = +-9.0 mm, 113.0 x 18.0 mm C-to-C, Ø4.0 mm bore x 6.5 mm deep)
+    #     Positioned completely outside the 101.2 x 23.2 mm (X = +-50.6 mm) PCB pocket with Ø9.2 mm bosses (inner edge at X = +-51.9 mm).
     for ex in (-p.outer_m3_ear_x, +p.outer_m3_ear_x):
         for ey in (-p.hole_y, +p.hole_y):
             body = body - blind_insert_bore_from_top_z(
@@ -396,7 +396,7 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
                 cy=ey,
             )
 
-    # 6b. 4x PCB End M2 Heat-Set Insert Bores (X = +-48.0 mm, Y = +-8.5 mm, 96.0 mm C-to-C, Ø3.2 mm bore x 4.5 mm deep)
+    # 6b. 4x PCB End M2 Heat-Set Insert Bores (X = +-48.0 mm, Y = +-9.0 mm, 96.0 x 18.0 mm C-to-C, Ø3.2 mm bore x 4.5 mm deep)
     #     Blind from z = 6.8 mm down to z = 2.3 mm (leaves 2.3 mm solid sealed floor at z=0!).
     for bx in (-p.hole_outer_x, +p.hole_outer_x):
         for by in (-p.hole_y, +p.hole_y):
@@ -411,11 +411,11 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
             )
 
     # 6c. 90° Metal Bracket Heat-Set Insert Bores on the Flat Rear Face (z = 0.0 mm):
-    #   - 2x M3 Heat-Set Insert Bores (Ø4.0 mm x 6.5 mm deep) at X = +-10.00 mm, Y = -14.00 mm
+    #   - 2x M3 Heat-Set Insert Bores (Ø4.0 mm x 6.5 mm deep) at X = +-10.00 mm, Y = -15.10 mm
     #     (Centered inside the metal bracket's 25.75 x 9.30 mm U-window for 100% M3 hardware setup!)
-    #   - 2x M2 Heat-Set Insert Bores (Ø3.2 mm x 4.5 mm deep) at X = +-10.25 mm, Y = -6.65 mm
+    #   - 2x M2 Heat-Set Insert Bores (Ø3.2 mm x 4.5 mm deep) at X = +-10.25 mm, Y = -7.75 mm
     #     (Aligned directly with the metal bracket's 2x Ø2.3 mm top crossbar holes!)
-    #   - 2x Anti-Rotation Key Sockets (2.75 x 2.8 x 3.2 mm with 45-deg roof) at X = +-7.45 mm, Y = -7.70 mm
+    #   - 2x Anti-Rotation Key Sockets (2.75 x 2.8 x 3.2 mm with 45-deg roof) at X = +-7.45 mm, Y = -8.80 mm
     #     (Aligned with the metal bracket's 2x 3.12 mm inner half-square notches!)
     for sign in (-1.0, +1.0):
         # M3 U-window insert bore (Ø4.0 mm x 6.5 mm deep + 45-deg conical roof)
@@ -423,7 +423,7 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
             bore_dia=p.m3_insert_bore_dia,
             depth=p.m3_insert_depth,
             cx=sign * 10.00,
-            cy=-14.00,
+            cy=-15.10,
             z0=0.0,
         )
         # M2 top crossbar insert bore (Ø3.2 mm x 4.5 mm deep + 45-deg conical roof)
@@ -431,17 +431,17 @@ def build_back_mount(p: CameraMountParams) -> mf.Manifold:
             bore_dia=p.m2_insert_bore_dia,
             depth=p.m2_insert_depth,
             cx=sign * 10.25,
-            cy=-6.65,
+            cy=-7.75,
             z0=0.0,
             chamfer_extra=0.6,
             chamfer_depth=0.5,
         )
-        # Anti-rotation notch alignment socket (Ø2.8 mm x 3.2 mm deep at X = +-7.45 mm, Y = -7.70 mm)
+        # Anti-rotation notch alignment socket (Ø2.8 mm x 3.2 mm deep at X = +-7.45 mm, Y = -8.80 mm)
         body = body - blind_insert_bore_from_bottom_z(
             bore_dia=2.8,
             depth=3.2,
             cx=sign * 7.45,
-            cy=-7.70,
+            cy=-8.80,
             z0=0.0,
             chamfer_extra=0.5,
             chamfer_depth=0.4,

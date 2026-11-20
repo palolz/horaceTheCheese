@@ -1,10 +1,10 @@
 {
   "parameters_mm": {
     "pcb_width": 100.0,
-    "pcb_height": 20.0,
+    "pcb_height": 22.0,
     "pcb_thickness": 1.6,
     "pcb_clearance_x": 0.6,
-    "pcb_clearance": 0.5,
+    "pcb_clearance": 0.6,
     "lens_baseline": 80.0,
     "lens_base_size": 14.0,
     "lens_barrel_dia": 14.0,
@@ -14,7 +14,7 @@
     "hole_outer_x": 48.0,
     "hole_inner_outer_x": 26.1,
     "hole_inner_inner_x": 22.1,
-    "hole_y": 8.5,
+    "hole_y": 9.0,
     "pcb_m2_hole_dia": 2.0,
     "tab_thickness": 2.0,
     "tab_width": 44.88,
@@ -53,33 +53,33 @@
       "watertight": true,
       "bounding_box_mm": [
         122.2,
-        40.2,
+        42.4,
         18.8
       ],
-      "volume_cm3": 31.05,
-      "triangles": 11262
+      "volume_cm3": 32.85,
+      "triangles": 11394
     },
     "horace_cam_back_mount.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_back_mount.stl",
       "watertight": true,
       "bounding_box_mm": [
         122.2,
-        40.2,
+        42.4,
         18.8
       ],
-      "volume_cm3": 31.05,
-      "triangles": 11262
+      "volume_cm3": 32.85,
+      "triangles": 11394
     },
     "horace_cam_front_visor.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_front_visor.stl",
       "watertight": true,
       "bounding_box_mm": [
-        107.4,
-        27.4,
+        107.6,
+        29.6,
         14.5
       ],
-      "volume_cm3": 15.22,
-      "triangles": 4652
+      "volume_cm3": 16.39,
+      "triangles": 4700
     },
     "horace_cam_usb_shim.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/camera_mount/horace_cam_usb_shim.stl",
