@@ -20,7 +20,7 @@ horaceTheCheese is a documented robotics build: a [Waveshare WAVE ROVER](https:/
 | --- | --- | --- | --- |
 | 1 | **Chassis & motor control** | **Done** | ROS 2 ↔ ESP32 JSON bridge (`wave_rover_base`) over Wi-Fi HTTP & UART; `HORACE LIVES` OLED & keyboard teleop verified |
 | 2 | **LiDAR bring-up** | Next up (D500 on bench) | LDROBOT D500 (LD19) publishing `/scan`; first 2D map with `slam_toolbox` |
-| 3 | **Binocular depth** | Planned | Stereo camera streaming depth images + point clouds over WiFi |
+| 3 | **Binocular depth** | **In progress (CAD v2.3 ready)** | `100 × 22 mm` stereo camera (`85.0 mm` baseline) in 3D-printable M3/M2 heat-set insert mount (`cad/camera_mount/`); depth + `/points` |
 | 4 | **Sensor fusion** | Planned | `robot_localization` EKF fusing IMU + wheel odometry, drift measured and tamed |
 | 5 | **Full SLAM** | Planned | RTAB-Map fusing LiDAR + vision into a persistent, loop-closing map |
 | 6 | **Autonomy** | Planned | Nav2 goal following: click the map, the rover drives there |
@@ -54,8 +54,9 @@ horaceTheCheese is a documented robotics build: a [Waveshare WAVE ROVER](https:/
 ## Repo layout
 
 ```
-docs/   MkDocs documentation site + hardware photos (the GitHub Pages source)
-ros2/   ROS 2 Jazzy workspace (wave_rover_base + wave_rover_bringup)
+cad/camera_mount/   Parametric 3D-printable stereo camera enclosure v2.3 (.stl + generator + drawings)
+docs/               MkDocs documentation site, CAD renders & hardware photos (GitHub Pages source)
+ros2/               ROS 2 Jazzy workspace (wave_rover_base + wave_rover_bringup)
 ```
 
 ## Design language

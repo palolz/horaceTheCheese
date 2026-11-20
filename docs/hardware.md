@@ -8,7 +8,8 @@ Everything the rover is (or will be) made of, photographed on the workbench as p
 | Metal top expansion plate | Slotted anodized mounting deck + standoffs for LiDAR & compute | Bundled with WAVE ROVER | <span class="htc-badge htc-badge--done">On hand</span> |
 | 2D LiDAR kit | 360° laser scans for Stage 2 SLAM | **LDROBOT D500 LiDAR Kit** (LD19 / DTOFLiDAR) | <span class="htc-badge htc-badge--done">On hand</span> |
 | Companion SBC (bench candidate) | Compact Linux board spotted on the cutting mat beside Horace | Raspberry Pi Zero-form-factor board | <span class="htc-badge htc-badge--done">On hand</span> |
-| Binocular stereo camera | Depth images + point clouds | TBD (unit ordered) | <span class="htc-badge htc-badge--progress">Ordered</span> |
+| Binocular stereo camera | `100.0 × 22.0 × 1.6 mm` dual-lens module (**85.0 mm** stereo baseline, `10 × 13 mm` FFC ribbons, Mini-USB) | On bench (`P1044926`–`P1044931`) | <span class="htc-badge htc-badge--done">On hand · Measured</span> |
+| Stereo camera enclosure & 90° mount (`v2.3`) | 3-part support-free 3D-printable housing (`horace_cam_back_mount_v2.stl`, `horace_cam_front_visor_v2.stl`, `horace_cam_usb_shim.stl`) for M3/M2 heat-set inserts | [`cad/camera_mount/`](stages/stage-3-depth.md) | <span class="htc-badge htc-badge--progress">CAD v2.3 ready</span> |
 | LiDAR mast + mounts | Yellow mast, printed brackets | 3D-printed, designed in-house | <span class="htc-badge htc-badge--planned">Planned</span> |
 
 ## Workbench gallery

@@ -47,11 +47,11 @@ LD19 publishing `/scan`. First 2D map with slam_toolbox.
 <div class="htc-card" markdown>
 <span class="htc-card__num">3</span>
 
-### Binocular depth
+### [Binocular depth](stages/stage-3-depth.md)
 
-Stereo camera streaming depth images and point clouds over WiFi.
+`85.0 mm`-baseline stereo camera (`100 × 22 mm` PCB) in a 3D-printable M3/M2 heat-set insert visor mount + Mini-USB clamp (`v2.3`), streaming depth and point clouds.
 
-<span class="htc-badge htc-badge--planned">Planned</span>
+<span class="htc-badge htc-badge--progress">In progress · CAD v2.3 ready</span>
 </div>
 
 <div class="htc-card" markdown>
@@ -92,7 +92,7 @@ Nav2 goal following. Point at the map; horace goes there.
 | WAVE ROVER 4WD chassis | Motors + ESP32 running stock Waveshare firmware (`AP:UGV`, `12.39 V`) | <span class="htc-badge htc-badge--done">Done · Rolling</span> |
 | LDROBOT D500 LiDAR Kit (LD19) | 360° 2D laser scans for SLAM | <span class="htc-badge htc-badge--done">On hand</span> |
 | Raspberry Pi Zero-class board | Compact Linux companion spotted on the bench | <span class="htc-badge htc-badge--done">On hand</span> |
-| Binocular stereo camera | Depth images + point clouds | <span class="htc-badge htc-badge--progress">Ordered</span> |
+| Binocular stereo camera + 3D mount (`v2.3`) | `100 × 22 mm` PCB (`85.0 mm` baseline) + support-free M3/M2 heat-set insert enclosure (`cad/camera_mount/`) | <span class="htc-badge htc-badge--progress">CAD v2.3 ready</span> |
 
 Full shopping list and real workbench photos live on the [Hardware & BOM](hardware.md) page.
 
