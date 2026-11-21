@@ -48,8 +48,8 @@
         69.6,
         32.0
       ],
-      "volume_cm3": 28.06,
-      "triangles": 11450
+      "volume_cm3": 27.9,
+      "triangles": 11350
     },
     "horace_lidar_tower_base.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/lidar_mount/horace_lidar_tower_base.stl",
@@ -59,8 +59,8 @@
         64.0,
         16.0
       ],
-      "volume_cm3": 10.43,
-      "triangles": 8178
+      "volume_cm3": 10.27,
+      "triangles": 8078
     },
     "horace_lidar_tower_top.stl": {
       "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/lidar_mount/horace_lidar_tower_top.stl",
@@ -72,6 +72,166 @@
       ],
       "volume_cm3": 17.55,
       "triangles": 4604
+    }
+  },
+  "assembly_verification": {
+    "units": "millimeter",
+    "origin": "(0,0,0) at center of 33.5/34.0mm 4-hole square on top face (Z=0.0mm) of expansion plate",
+    "camera_top_z_mm": 45.5,
+    "lidar_turret_z_range_mm": [
+      52.22,
+      65.02
+    ],
+    "lidar_beam_plane_z_mm": 59.0,
+    "turret_clearance_above_camera_mm": 6.72,
+    "beam_clearance_above_camera_mm": 13.5,
+    "boolean_collisions_mm3": {
+      "tower_vs_radxa_zero_3w_mm3": 0.0,
+      "tower_vs_breakout_40x20x8_mm3": 0.0,
+      "tower_vs_ldrobot_d500_lidar_mm3": 0.0,
+      "tower_vs_expansion_plate_mm3": 0.0,
+      "tower_vs_front_camera_v2_3_mm3": 0.0
+    },
+    "threemf_verification": {
+      "unit": "millimeter",
+      "object_names": [
+        "01_Printable_Tower_Mount",
+        "02_Radxa_ZERO_3W_SBC",
+        "03_LiDAR_Breakout_40x20x8",
+        "04_LDROBOT_D500_LiDAR",
+        "05_WAVE_ROVER_Expansion_Plate",
+        "06_Front_Stereo_Camera_v2_3"
+      ],
+      "reloaded_geometries": [
+        "01_Printable_Tower_Mount",
+        "02_Radxa_ZERO_3W_SBC",
+        "03_LiDAR_Breakout_40x20x8",
+        "04_LDROBOT_D500_LiDAR",
+        "05_WAVE_ROVER_Expansion_Plate",
+        "06_Front_Stereo_Camera_v2_3"
+      ]
+    },
+    "assembly_parts": {
+      "01_Printable_Tower_Mount": {
+        "stl_file": "assembly_parts_stl/01_printable_tower_mount.stl",
+        "watertight": true,
+        "bounds_min_mm": [
+          -33.5,
+          -41.5,
+          0.0
+        ],
+        "bounds_max_mm": [
+          33.5,
+          28.1,
+          32.0
+        ],
+        "extents_mm": [
+          67.0,
+          69.6,
+          32.0
+        ],
+        "color_hex": "#F2B417"
+      },
+      "02_Radxa_ZERO_3W_SBC": {
+        "stl_file": "assembly_parts_stl/02_ref_radxa_zero_3w.stl",
+        "watertight": true,
+        "bounds_min_mm": [
+          -32.5,
+          -41.25,
+          3.42
+        ],
+        "bounds_max_mm": [
+          32.5,
+          -11.0,
+          15.52
+        ],
+        "extents_mm": [
+          65.0,
+          30.25,
+          12.1
+        ],
+        "color_hex": "#2D8A4E"
+      },
+      "03_LiDAR_Breakout_40x20x8": {
+        "stl_file": "assembly_parts_stl/03_ref_lidar_breakout_40x20x8.stl",
+        "watertight": true,
+        "bounds_min_mm": [
+          -9.9,
+          -19.4,
+          18.82
+        ],
+        "bounds_max_mm": [
+          9.9,
+          20.6,
+          26.82
+        ],
+        "extents_mm": [
+          19.8,
+          40.0,
+          8.0
+        ],
+        "color_hex": "#1E3A5F"
+      },
+      "04_LDROBOT_D500_LiDAR": {
+        "stl_file": "assembly_parts_stl/04_ref_ldrobot_d500_lidar.stl",
+        "watertight": true,
+        "bounds_min_mm": [
+          -25.75,
+          -19.25,
+          30.02
+        ],
+        "bounds_max_mm": [
+          25.75,
+          27.1,
+          65.02
+        ],
+        "extents_mm": [
+          51.5,
+          46.35,
+          35.0
+        ],
+        "color_hex": "#2B5FAB"
+      },
+      "05_WAVE_ROVER_Expansion_Plate": {
+        "stl_file": "assembly_parts_stl/05_ref_wave_rover_expansion_plate.stl",
+        "watertight": true,
+        "bounds_min_mm": [
+          -43.0,
+          -39.25,
+          -2.0
+        ],
+        "bounds_max_mm": [
+          43.0,
+          74.16,
+          19.63
+        ],
+        "extents_mm": [
+          86.0,
+          113.41,
+          21.63
+        ],
+        "color_hex": "#2C3036"
+      },
+      "06_Front_Stereo_Camera_v2_3": {
+        "stl_file": "assembly_parts_stl/06_ref_front_stereo_camera_v2_3.stl",
+        "watertight": false,
+        "bounds_min_mm": [
+          -61.1,
+          74.16,
+          3.1
+        ],
+        "bounds_max_mm": [
+          61.1,
+          101.56,
+          45.5
+        ],
+        "extents_mm": [
+          122.2,
+          27.4,
+          42.4
+        ],
+        "color_hex": "#E4402A"
+      }
     }
   }
 }

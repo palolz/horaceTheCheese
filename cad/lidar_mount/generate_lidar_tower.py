@@ -246,7 +246,17 @@ def build_lidar_sbc_tower(p: LidarTowerParams) -> tuple[mf.Manifold, mf.Manifold
         center_xy=(0.0, p.sbc_center_y),
         z0=-1.0,
     )
-    tower = tower - center_win - sbc_win
+    #     - Left-edge microSD card slot recess (X = -34.0..-19.0 mm, Y = -32.5..-19.5 mm, Z = 2.4..6.0 mm)
+    #       so the underside microSD holder on the Radxa ZERO 3W has full clearance and card access!
+    sd_recess = rounded_rect_prism(
+        width=16.0,
+        height=13.0,
+        depth=4.0,
+        radius=1.5,
+        center_xy=(-27.0, p.sbc_center_y),
+        z0=2.4,
+    )
+    tower = tower - center_win - sbc_win - sd_recess
 
     # =========================================================================
     # TIER 2 & 3 RISER PILLARS, CABLE LOOP ARCHES & MEZZANINE (Z = 0.0 .. 30.0 mm)
