@@ -1,32 +1,35 @@
-# LiDAR (LDROBOT D500) + Breakout Board + Radxa ZERO 3W Tower Mount (`cad/lidar_mount/`)
+# LiDAR (LDROBOT D500) + Breakout Board + Radxa ZERO 3W Tower Mount v2 (`cad/lidar_mount/`)
 
-3D-printable 3-tier mounting tower for Horace's **LDROBOT D500 (`STL-19P`) LiDAR**, **`40.0 × 20.0 × 8.0 mm` press-fit LiDAR USB-to-UART breakout board**, and **Radxa ZERO 3W (`65.0 × 30.0 × 10.3 mm`, `57.0–58.0 × 22.0–23.0 mm` holes)** on the WAVE ROVER metal expansion plate.
+3D-printable structure-only mounting tower (`v2`) for Horace's **LDROBOT D500 (`STL-19P`) LiDAR**, **`40.0 × 20.0 × 8.0 mm` press-fit LiDAR USB-to-UART breakout board**, and **Radxa ZERO 3W (`65.0 × 30.0 × 10.3 mm`, `57.0–58.0 × 22.0–23.0 mm` holes)** on the WAVE ROVER metal expansion plate.
 
-## Opening the 3D Assembly & Printable Parts in Onshape
+## Printable Structure STL Files (100% Support-Free FDM on `Z = 0.0 mm`, Single Solid Body)
 
-All files are in `/Users/palolzaman/Desktop/horace_lidar_tower_onshape/` (and `/Users/palolzaman/Downloads/`) in **millimeters (`mm`)** sharing a single global coordinate origin `(0, 0, 0)` at the center of the `33.5×33.5 / 34.0×34.0 mm` 4-hole square on the top surface (`Z = 0.0 mm`) of the WAVE ROVER metal expansion plate:
+Every STL file is verified as a **single connected watertight solid (`body_count = 1`, `watertight = True`)** with a flat `Z = 0.0 mm` bottom face:
 
-1. **Multi-Part Onshape Assembly (`horace_lidar_tower_assembly.3mf`):**
-   - In Onshape, click **Create → Import files…** (or `+` → **Import** inside a Document) and select **`horace_lidar_tower_assembly.3mf`**.
-   - Choose **"Combine to a single Part Studio"** (leave **"Create composite"** unchecked so all 6 components appear as 6 separate named Parts in exact assembled alignment!).
-   - Included objects (`unit="millimeter"`):
-     - `01_Printable_Tower_Mount` (`Z = 0.00..32.00 mm`)
-     - `02_Radxa_ZERO_3W_SBC` (`Z = 3.42..15.52 mm`)
-     - `03_LiDAR_Breakout_40x20x8` (`Z = 18.82..26.82 mm`)
-     - `04_LDROBOT_D500_LiDAR` (`Z = 30.02..65.02 mm`, rotating turret at `Z = 52.22..65.02 mm`)
-     - `05_WAVE_ROVER_Expansion_Plate` (`Z = -2.00..19.63 mm`)
-     - `06_Front_Stereo_Camera_v2_3` (`Z = 3.10..45.50 mm` — built from the actual `horace_cam_back_mount_v2.stl` + `horace_cam_front_visor_v2.stl`)
-2. **Individual Co-Registered Assembly STLs (`assembly_parts_stl/01_...` through `06_...`):**
-   - Because all 6 individual `.stl` files share the exact same `(0, 0, 0)` origin, importing them into Onshape (`Units: Millimeter`) or inserting them into an Onshape Assembly and clicking the green checkmark (`✓`) snaps all 6 parts into their exact assembled positions automatically.
-   - Also includes **`horace_lidar_tower_assembly.stl`** (a single combined `.stl` of all 6 parts).
+| File | Bounding Box (`X × Y × Z`) | Volume | Bodies | Description |
+| --- | --- | --- | --- | --- |
+| `horace_lidar_sbc_tower.stl` | `67.0 × 95.0 × 37.0 mm` | `44.76 cm³` (~54 g) | `1` | **1-piece support-free 3-tier tower (`v2`)** with flush side pillars (zero side clip protrusions), `Z = +35.0 mm` LiDAR platform (`Z = 30.8..35.0 mm` deck, zero front-ear downward hang), `17.3 mm` tall (`Z = 13.5..30.8 mm`) × `16.2 mm` wide USB plug/breakout clearance corridor (`13.8 mm` above the `Z = 17.0 mm` PCB seat), and rear open-sky Radxa ZERO 3W bay (`Y = -50.5 mm` center, 100% unobstructed vertical 40-pin GPIO access). |
+| `horace_lidar_tower_base.stl` | `67.0 × 89.0 × 12.0 mm` | `14.56 cm³` (~18 g) | `1` | **Optional 2-piece lower half** (`Z = 0.0..12.0 mm`): Expansion plate base (`33.5–34.0 mm` 4× M3 square + `49.0 mm` wide holes) + rear Radxa ZERO 3W bay (`Y = -50.5 mm`) + 2× M3 heat-set insert bores (`X = ±19.6, Y = +9.5 mm`). |
+| `horace_lidar_tower_top.stl` | `54.9 × 49.8 × 25.0 mm` | `30.03 cm³` (~36 g) | `1` | **Optional 2-piece upper half** (`Z = 12.0..37.0 mm` shifted to `Z = 0.0` for flat printing): Press-fit `40×20×8 mm` breakout mezzanine + `17.3 mm` USB plug tunnel + `Z = +35.0 mm` LDROBOT D500 LiDAR platform. |
 
-## Printable STL Files (100% Support-Free FDM on `Z = 0.0 mm`)
+## Key v2 Structural Revisions (from Onshape Review)
 
-| File | Bounding Box (`X × Y × Z`) | Volume | Description |
-| --- | --- | --- | --- |
-| `horace_lidar_sbc_tower.stl` | `67.0 × 69.6 × 32.0 mm` | `27.90 cm³` (~34 g) | **1-piece support-free 3-tier tower** with 45°-vaulted arches, expansion plate `33.5×33.5 mm` + `49.0 mm` mounting slots, Radxa ZERO 3W bay (with left microSD recess), press-fit `40×20×8 mm` breakout mezzanine, side USB cable loop guide clips, and `Z = +30.0 mm` LiDAR platform. |
-| `horace_lidar_tower_base.stl` | `67.0 × 64.0 × 16.0 mm` | `10.27 cm³` (~13 g) | **Optional 2-piece lower half** (`Z = 0.0..16.0 mm`): Expansion plate base + Radxa ZERO 3W bay + side cable clips + 2× M3 heat-set insert bores (`X = ±19.6, Y = +0.5 mm`). |
-| `horace_lidar_tower_top.stl` | `54.9 × 49.4 × 16.0 mm` | `17.55 cm³` (~21 g) | **Optional 2-piece upper half** (`Z = 16.0..32.0 mm` shifted to `Z = 0.0` for printing; see `assembly_parts_stl/01b_tower_top_assembled_pos.stl` for `Z = 16..32 mm` assembled position). |
+1. **Both Side Protrusions Removed (`body_count = 1`):**
+   - Deleted the left and right side cable-clip protrusions completely so the outer pillar walls (`X = ±23.4 mm`) are clean, flush, and print as a single solid body (`body_count = 1` on `horace_lidar_sbc_tower.stl`, `horace_lidar_tower_base.stl`, and `horace_lidar_tower_top.stl`).
+   - Kept the lower pillars at `Y = -12.5..+13.5 mm` (between the `Y = ±16.875 mm` central square M3 holes) so all 4 central M3 deck bolts have 100% open vertical screwdriver access.
+
+2. **Front LiDAR Ear Downward Protrusion Removed + Doubled Breakout / USB Plug Clearance (`Z = 13.5..30.8 mm`):**
+   - Raised the LiDAR mounting deck from `Z = +30.0 mm` to **`Z = +35.0 mm`** (`4.2 mm` thick top plate `Z = 30.8..35.0 mm`, placing the rotating LiDAR optical turret at **`Z = 57.2..70.0 mm`** — **`+11.7 mm` higher than the `45.5 mm` front camera casing** and **`+18.5 mm` higher at the `Z = 64.0 mm` laser beam plane**).
+   - Eliminated the downward-hanging cone under the front LiDAR ear (`X = 0.0, Y = +23.30 mm`): the front ear is now supported laterally within `Z = 30.8..35.0 mm` and by side corbels at `|X| ≥ 8.5 mm`, with a blind `Ø 3.2 × 3.0 mm` M2 insert bore (`Z = 35.0..31.6 mm`) + `Ø 2.6 mm` pilot hole so **nothing hangs below `Z = 30.8 mm` anywhere in the `16.2 mm`-wide central corridor (`X = -8.1..+8.1 mm`)**.
+   - Lowered the `40.0 × 20.0 × 8.0 mm` breakout board seating ledges to **`Z = 17.0 mm`** and carved a continuous **`16.2 mm` wide × `17.3 mm` tall (`Z = 13.5..30.8 mm`) USB plug & under-board channel** through the entire length of the bridge:
+     - **`13.8 mm` vertical clearance above the `Z = 17.0 mm` PCB seat** (more than double the `6.4 mm` component height),
+     - **`3.5 mm` under-plug clearance below the `Z = 17.0 mm` PCB seat** (`Z = 13.5..17.0 mm`) for thick USB-C / Micro-USB plug overmolds,
+     - **4× corner Y-stops** (`X = ±8.1..±10.15 mm`) + **4× top snap-retention nibs** (`Z = 18.6..20.0 mm`) hold the `40 × 20 mm` breakout board securely without screws.
+
+3. **Radxa ZERO 3W Moved Rearward (`Y = -50.5 mm`) for 100% Open-Sky 40-Pin GPIO Access:**
+   - Moved the `65.0 × 30.0 × 10.3 mm` Radxa ZERO 3W bay back to **`Y = -50.5 mm`** (`Y = -65.5..-35.5 mm`, corner standoffs at **`X = ±28.75 mm, Y = -39.25` & `-61.75 mm`**, `Z = 5.6 mm`).
+   - The **40-pin GPIO header (`Y = -39.25 mm`)** now sits **`17.75 mm` behind the rearmost edge of the LiDAR bridge (`Y = -21.5 mm`)** with **100% unobstructed vertical sky (`Z = 7.2 mm → ∞`)** so DuPont jumper wires or a 40-pin connector plug straight in from above.
+   - The expansion plate's rear mounting holes (`X = ±24.50 mm, Y = -32.75 mm`) sit cleanly ahead of the Radxa PCB (`Y = -35.5 mm`), giving unobstructed vertical access to every mounting screw.
 
 ## Extracted & Verified Component Dimensions
 
