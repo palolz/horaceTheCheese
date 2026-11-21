@@ -1,0 +1,77 @@
+{
+  "parameters_mm": {
+    "deck_square_min": 33.5,
+    "deck_square_dxf": 34.0,
+    "deck_square_half": 16.875,
+    "deck_wide_span": 49.0,
+    "deck_rear_hole_y": -32.75,
+    "camera_top_z": 45.5,
+    "lidar_deck_z": 30.0,
+    "lidar_base_size": 38.5,
+    "lidar_base_height": 22.2,
+    "lidar_turret_dia": 35.3,
+    "lidar_turret_height": 12.8,
+    "lidar_beam_offset_z": 29.0,
+    "lidar_front_ear_y": 23.3,
+    "lidar_side_ear_x": 21.95,
+    "lidar_side_ear_y": -8.65,
+    "brk_length": 40.0,
+    "brk_width": 20.0,
+    "brk_thickness": 1.6,
+    "brk_max_height": 8.0,
+    "brk_pocket_len": 40.6,
+    "brk_pocket_wid": 20.3,
+    "brk_seat_z": 18.8,
+    "sbc_length": 65.0,
+    "sbc_width": 30.0,
+    "sbc_total_height": 10.3,
+    "sbc_gpio_pin_len": 6.0,
+    "sbc_center_y": -26.0,
+    "sbc_hole_x_min": 57.0,
+    "sbc_hole_x_max": 58.0,
+    "sbc_hole_y_min": 22.0,
+    "sbc_hole_y_max": 23.0,
+    "sbc_standoff_z": 5.2,
+    "m3_insert_dia": 4.0,
+    "m3_insert_depth": 6.0,
+    "m3_clear_dia": 3.4,
+    "m2_insert_dia": 3.2,
+    "m2_insert_depth": 4.5,
+    "m2_clear_dia": 2.6
+  },
+  "files": {
+    "horace_lidar_sbc_tower.stl": {
+      "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/lidar_mount/horace_lidar_sbc_tower.stl",
+      "watertight": true,
+      "bounding_box_mm": [
+        67.0,
+        69.6,
+        32.0
+      ],
+      "volume_cm3": 28.06,
+      "triangles": 11450
+    },
+    "horace_lidar_tower_base.stl": {
+      "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/lidar_mount/horace_lidar_tower_base.stl",
+      "watertight": true,
+      "bounding_box_mm": [
+        67.0,
+        64.0,
+        16.0
+      ],
+      "volume_cm3": 10.43,
+      "triangles": 8178
+    },
+    "horace_lidar_tower_top.stl": {
+      "path": "/Users/palolzaman/.copilot/repos/copilot-worktrees/horaceTheCheese/palolz-turbo-system/cad/lidar_mount/horace_lidar_tower_top.stl",
+      "watertight": true,
+      "bounding_box_mm": [
+        54.9,
+        49.35,
+        16.0
+      ],
+      "volume_cm3": 17.55,
+      "triangles": 4604
+    }
+  }
+}
